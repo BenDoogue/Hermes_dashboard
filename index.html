@@ -3,291 +3,325 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ HERMES_DASHBOARD // WELLINGTON COMMAND CENTER ⚡</title>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Patrick+Hand&family=Special+Elite&display=swap" rel="stylesheet">
+    <title>Hermes Dashboard // Wellington Command Center</title>
     <style>
-        * { box-sizing: border-box; }
-        body {
-            background-color: #f5f0e1;
-            background-image: linear-gradient(#e6dec5 1px, transparent 1px), linear-gradient(90deg, #e6dec5 1px, transparent 1px);
-            background-size: 24px 24px;
-            color: #2c2c2c;
-            font-family: 'Patrick Hand', cursive, sans-serif;
-            margin: 0;
-            padding: 20px;
-            font-size: 17px;
+        :root {
+            --bg-color: #fafafa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --accent-color: #2563eb;
+            --badge-bg: #eff6ff;
+            --badge-text: #1e40af;
+            --radius: 8px;
         }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.5;
+            padding: 40px 20px;
+        }
+
         .container {
             max-width: 900px;
             margin: 0 auto;
-            background: #fdfbf7;
-            border: 2.5px solid #2c2c2c;
-            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-            padding: 35px 40px;
-            box-shadow: 6px 8px 0px rgba(44,44,44,0.18);
-            position: relative;
         }
+
+        header {
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
         .dashboard-title {
-            text-align: center;
-            font-family: 'Caveat', cursive, sans-serif;
-            font-size: 38px;
-            font-weight: bold;
-            color: #1a1a1a;
-            margin-bottom: 5px;
-            letter-spacing: 1px;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
         }
+
         .dashboard-subtitle {
-            text-align: center;
-            font-size: 18px;
-            color: #555;
-            margin-bottom: 20px;
-            font-style: italic;
-        }
-        .status-bar {
-            background: #f4efe1;
-            border: 1.5px dashed #2c2c2c;
-            padding: 8px 14px;
-            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-            text-align: center;
             font-size: 15px;
-            color: #2c2c2c;
-            margin-bottom: 25px;
+            color: var(--text-secondary);
+        }
+
+        .status-bar {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
+
         h2, h3 {
-            font-family: 'Caveat', cursive, sans-serif;
-            font-size: 26px;
-            color: #1a1a1a;
-            border-bottom: 1.5px dashed #2c2c2c;
-            padding-bottom: 4px;
-            margin-top: 30px;
-            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 32px;
+            margin-bottom: 16px;
         }
-        /* Sketchy Notebook Cards */
+
+        /* Clean Cards */
         .sketch-card {
-            background: #fffefb;
-            border: 2px solid #2c2c2c;
-            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-            padding: 18px 22px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 3px 4px 0px rgba(44,44,44,0.12);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
+
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
-            font-weight: bold;
-            font-size: 19px;
-            font-family: 'Caveat', cursive, sans-serif;
+            margin-bottom: 16px;
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
         }
+
         /* Compact Weather Strip */
         .weather-strip-compact {
             display: grid;
             grid-template-columns: repeat(9, 1fr);
-            gap: 6px;
+            gap: 8px;
             text-align: center;
-            margin-top: 10px;
+            margin-top: 8px;
         }
         .weather-slot {
-            background: #f7f3e8;
-            border: 1.5px solid #2c2c2c;
-            border-radius: 12px;
-            padding: 8px 2px;
+            background: #f9fafb;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px 4px;
             font-size: 13px;
         }
         .weather-slot .time {
             font-size: 11px;
-            font-weight: bold;
-            color: #555;
-            margin-bottom: 2px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
         }
         .weather-slot .icon {
-            font-size: 20px;
-            margin: 2px 0;
+            font-size: 18px;
+            margin: 4px 0;
         }
         .weather-slot .temp {
-            font-size: 12px;
-            font-weight: bold;
+            font-size: 13px;
+            font-weight: 600;
         }
-        /* To-Do List with Reorder Buttons */
+
+        /* To-Do List */
         .todo-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 10px;
-            padding: 8px 12px;
-            background: #fffefb;
-            border: 1.5px solid #2c2c2c;
-            border-radius: 12px;
+            gap: 12px;
+            padding: 10px 12px;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
             margin-bottom: 8px;
+            font-size: 15px;
         }
         .todo-item.completed span.todo-text {
             text-decoration: line-through;
-            color: #888;
+            color: #9ca3af;
         }
         .todo-left {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             flex: 1;
+        }
+        .todo-left input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
         }
         .todo-actions {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
         }
         .sketch-btn {
-            background: #f4efe1;
-            border: 1.5px solid #2c2c2c;
-            border-radius: 8px;
-            padding: 3px 8px;
-            font-family: 'Patrick Hand', cursive;
-            font-size: 14px;
+            background: #f3f4f6;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 13px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: background 0.15s;
         }
         .sketch-btn:hover {
-            background: #e8e0cc;
+            background: #e5e7eb;
         }
         .todo-add-box {
             display: flex;
             gap: 8px;
-            margin-top: 12px;
+            margin-top: 16px;
         }
         .sketch-input {
             flex: 1;
-            background: #fffefb;
-            border: 1.5px solid #2c2c2c;
-            border-radius: 10px;
-            padding: 6px 12px;
-            font-family: 'Patrick Hand', cursive;
-            font-size: 16px;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
             outline: none;
+            color: var(--text-primary);
         }
+        .sketch-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+
         /* Agenda / Day Plan */
         .agenda-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 12px;
-            background: #fffefb;
-            border: 1.5px solid #2c2c2c;
-            border-radius: 12px;
+            padding: 10px 14px;
+            background: #f9fafb;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
             margin-bottom: 8px;
-            font-size: 16px;
+            font-size: 15px;
         }
         .agenda-time {
-            font-weight: bold;
-            color: #1a73e8;
-            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: var(--accent-color);
+            font-family: ui-monospace, monospace;
+            font-size: 14px;
         }
-        /* Cloud Sync Panel inside Collapsible Details */
+
+        /* Cloud Sync Drawer */
         details.cloud-sync-drawer {
-            border: 1.5px dashed #2c2c2c;
-            border-radius: 12px;
-            background: #f7f3e8;
-            margin-bottom: 20px;
-            padding: 10px 15px;
+            border: 1px dashed var(--border-color);
+            border-radius: var(--radius);
+            background: #fdfdfd;
+            margin-bottom: 24px;
+            padding: 12px 16px;
         }
         details.cloud-sync-drawer summary {
             cursor: pointer;
-            font-weight: bold;
-            font-family: 'Caveat', cursive;
-            font-size: 20px;
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-primary);
             outline: none;
         }
         .sync-form-row {
             display: flex;
             gap: 8px;
-            margin-top: 10px;
+            margin-top: 12px;
             flex-wrap: wrap;
         }
         .sync-form-row input {
             flex: 1;
             min-width: 140px;
-            padding: 6px 10px;
-            border: 1.5px solid #2c2c2c;
-            border-radius: 8px;
-            font-family: 'Patrick Hand', cursive;
-            font-size: 15px;
-            background: #fffefb;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            background: #fff;
         }
-        /* Notebook Table for Games */
+
+        /* Table */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            overflow: hidden;
         }
         th, td {
-            border: 1.5px solid #2c2c2c;
-            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 16px;
             text-align: left;
-            font-size: 16px;
+            font-size: 14px;
         }
         th {
-            background-color: #f4efe1;
-            font-family: 'Caveat', cursive;
-            font-size: 20px;
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: var(--text-secondary);
         }
-        a { color: #1a0dab; text-decoration: underline; }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        a { color: var(--accent-color); text-decoration: none; font-weight: 500; }
+        a:hover { text-decoration: underline; }
+        
         .badge {
             display: inline-block;
             padding: 2px 8px;
-            border: 1px solid #2c2c2c;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: bold;
-            background: #e6f4ea;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--badge-bg);
+            color: var(--badge-text);
         }
+
         .footer-note {
             text-align: center;
-            margin-top: 30px;
-            font-size: 15px;
-            color: #666;
-            border-top: 1.5px dashed #2c2c2c;
-            padding-top: 15px;
-            font-family: 'Caveat', cursive;
-            font-size: 20px;
+            margin-top: 40px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="dashboard-title">
-        ⚡ HERMES_DASHBOARD // WELLINGTON COMMAND CENTER ⚡
-    </div>
-    <div class="dashboard-subtitle">~ Paper Sketch & Notebook Edition ~</div>
+    <header>
+        <div class="dashboard-title">Hermes Dashboard</div>
+        <div class="dashboard-subtitle">Wellington Command Center</div>
+    </header>
 
     <div class="status-bar">
-        <div>SYSTEM STATUS: ONLINE &bull; WELLINGTON TIME: <span id="timestamp">LOADING...</span></div>
-        <div><span id="syncStatusBadge" class="badge" style="background: #e8f0fe; color: #1a73e8;">☁️ Local Storage</span></div>
+        <div>System Status: <span style="color: #10b981; font-weight: 600;">Online</span> &bull; Wellington Time: <span id="timestamp">Loading...</span></div>
+        <div><span id="syncStatusBadge" class="badge">Local Storage</span></div>
     </div>
 
-    <!-- CLOUD SYNC CONFIG DRAWER (For Cross-Device Sync) -->
+    <!-- CLOUD SYNC CONFIG DRAWER -->
     <details class="cloud-sync-drawer">
-        <summary>☁️ Enable Cross-Device Cloud Sync (JSONbin.io)</summary>
-        <div style="font-size: 15px; margin-top: 8px; color: #444; line-height: 1.4;">
-            Want your todos and schedule to sync across your phone, tablet, and laptop? Create a free bin on <a href="https://jsonbin.io" target="_blank">jsonbin.io</a>, paste your <b>Bin ID</b> and <b>Master Key</b> below, and click Save!
+        <summary>Cloud Sync Configuration (JSONbin.io)</summary>
+        <div style="font-size: 14px; margin-top: 8px; color: var(--text-secondary); line-height: 1.4;">
+            Sync your tasks across devices using <a href="https://jsonbin.io" target="_blank">jsonbin.io</a>. Enter your <b>Bin ID</b> and <b>Master Key</b> below:
         </div>
         <div class="sync-form-row">
             <input type="text" id="syncBinIdInput" placeholder="JSONbin Bin ID">
-            <input type="password" id="syncApiKeyInput" placeholder="JSONbin Master Key ($2a$10$...)">
+            <input type="password" id="syncApiKeyInput" placeholder="JSONbin Master Key">
             <button class="sketch-btn" id="saveSyncConfigBtn">Save & Sync</button>
-            <button class="sketch-btn" id="testSyncBtn" style="background:#e8f0fe;">🔄 Force Pull</button>
+            <button class="sketch-btn" id="testSyncBtn">Force Pull</button>
         </div>
     </details>
 
     <!-- DAILY WEATHER STRIP -->
     <div class="sketch-card">
         <div class="card-header">
-            <span>⛅ Wellington Weather Forecast (Today)</span>
-            <span id="weatherSummaryLabel" style="font-size: 15px; font-weight: normal; color: #555;">11°C – 18°C &bull; Crisp & Blustery</span>
+            <span>Wellington Weather Forecast (Today)</span>
+            <span id="weatherSummaryLabel" style="font-size: 14px; font-weight: normal; color: var(--text-secondary);">11°C – 18°C &bull; Crisp & Blustery</span>
         </div>
         <div class="weather-strip-compact" id="compactWeatherStrip">
             <!-- Populated by JS -->
@@ -297,34 +331,34 @@
     <!-- DAY PLAN & SCHEDULE -->
     <div class="sketch-card">
         <div class="card-header">
-            <span>📅 Today's Schedule & Plan</span>
-            <span style="font-size: 15px; font-weight: normal; color: #555;" id="briefing-date-label">Sunday, 15 Nov 2026</span>
+            <span>Today's Schedule & Plan</span>
+            <span style="font-size: 14px; font-weight: normal; color: var(--text-secondary);" id="briefing-date-label">Sunday, 15 Nov 2026</span>
         </div>
         <div id="agendaListContainer">
             <!-- Populated by JS -->
         </div>
     </div>
 
-    <!-- TO-DO LIST WITH REORDER BUTTONS -->
+    <!-- TO-DO LIST -->
     <div class="sketch-card">
         <div class="card-header">
-            <span>✅ Interactive To-Do List (Reorderable)</span>
-            <span id="todoCountBadge" style="font-size: 15px; font-weight: normal; color: #555;">0/0 done</span>
+            <span>Interactive To-Do List</span>
+            <span id="todoCountBadge" style="font-size: 14px; font-weight: normal; color: var(--text-secondary);">0/0 done</span>
         </div>
         <div id="todoListContainer">
             <!-- Populated by JS -->
         </div>
         <div class="todo-add-box">
             <input type="text" id="newTodoInput" class="sketch-input" placeholder="Add a new task and press Enter...">
-            <button class="sketch-btn" id="addTodoBtn">+ Add Task</button>
+            <button class="sketch-btn" id="addTodoBtn">Add Task</button>
         </div>
     </div>
 
-    <!-- EMAIL SUMMARY (PAST 24HRS) -->
+    <!-- EMAIL SUMMARY -->
     <div class="sketch-card">
         <div class="card-header">
-            <span>✉️ Important Email Summary (Past 24hrs)</span>
-            <span style="font-size: 15px; font-weight: normal; color: #555;" id="emailCountLabel">0 emails</span>
+            <span>Important Email Summary (Past 24hrs)</span>
+            <span style="font-size: 14px; font-weight: normal; color: var(--text-secondary);" id="emailCountLabel">0 emails</span>
         </div>
         <div id="emailSummaryContainer">
             <!-- Populated by JS -->
@@ -334,19 +368,19 @@
     <!-- DAILY SPOTLIGHT -->
     <div class="sketch-card">
         <div class="card-header">
-            <span>💡 Daily Focus & Spotlight</span>
-            <span style="font-size: 15px; font-weight: normal; color: #555;" id="spotlightTopicLabel">Cognitive Science & AI</span>
+            <span>Daily Focus & Spotlight</span>
+            <span style="font-size: 14px; font-weight: normal; color: var(--text-secondary);" id="spotlightTopicLabel">Cognitive Science & AI</span>
         </div>
-        <div style="font-size: 17px; line-height: 1.5; display: flex; flex-direction: column; gap: 8px;">
-            <div><strong>🎯 Morning Task:</strong> <span id="spotlightMorningTask">Execute today's schedule smoothly: 39 The Terrace work, Willis St presentation, and home to Essex St.</span></div>
-            <div><strong>🧠 Fact of the Day:</strong> <span id="spotlightFact">Predictive coding theory suggests the brain isn't a passive feature detector — it continuously predicts incoming sensory signals and updates internal models only on surprise (prediction error).</span></div>
-            <div><strong>📜 History Fact:</strong> <span id="spotlightHistoryFact"></span></div>
-            <div><strong>📖 Word of the Day:</strong> <strong id="spotlightWordTerm">Affordance</strong> — <span id="spotlightWordDef">In cognitive science & design, an action possibility directly offered by the environment to an agent.</span></div>
+        <div style="font-size: 15px; line-height: 1.6; display: flex; flex-direction: column; gap: 10px;">
+            <div><strong>Morning Task:</strong> <span id="spotlightMorningTask">Execute today's schedule smoothly: 39 The Terrace work, Willis St presentation, and home to Essex St.</span></div>
+            <div><strong>Fact of the Day:</strong> <span id="spotlightFact">Predictive coding theory suggests the brain isn't a passive feature detector — it continuously predicts incoming sensory signals and updates internal models only on surprise (prediction error).</span></div>
+            <div><strong>History Fact:</strong> <span id="spotlightHistoryFact"></span></div>
+            <div><strong>Word of the Day:</strong> <strong id="spotlightWordTerm">Affordance</strong> — <span id="spotlightWordDef">In cognitive science & design, an action possibility directly offered by the environment to an agent.</span></div>
         </div>
     </div>
 
     <!-- GAMES & APPS -->
-    <h3>🎮 Interactive Games & Tools</h3>
+    <h3>Interactive Games & Tools</h3>
     <table>
         <tr>
             <th>PROJECT_ID</th>
@@ -365,12 +399,6 @@
             <td>Procedural DFS maze solver & generator</td>
             <td><span class="badge">INTERACTIVE</span></td>
             <td><a href="maze.html">Launch &rarr;</a></td>
-        </tr>
-        <tr>
-            <td><b>Hubble Deep Field</b></td>
-            <td>Cosmic scale & angular size visualiser</td>
-            <td><span class="badge">SIMULATOR</span></td>
-            <td><a href="hubble.html">Explore &rarr;</a></td>
         </tr>
         <tr>
             <td><b>Tank Duel (2P)</b></td>
@@ -393,7 +421,7 @@
     </table>
 
     <div class="footer-note">
-        VISITOR COUNT: <strong>0001337</strong> &bull; NOTEBOOK SKETCH EDITION
+        Visitor Count: <strong>1,337</strong> &bull; Clean & Minimal Edition
     </div>
 </div>
 
@@ -419,7 +447,7 @@
     setInterval(updateSystemTimestamp, 1000);
 
     const fileData = window.BRIEFING_DATA || {};
-    const STORAGE_KEY = 'hermes_notebook_state_v2';
+    const STORAGE_KEY = 'hermes_notebook_state_v3';
     let state = null;
 
     function buildFreshState() {
@@ -459,7 +487,7 @@
     let syncTimeout = null;
     async function pushCloudState() {
         if (!cloudConfig || !cloudConfig.binId) return;
-        document.getElementById('syncStatusBadge').innerText = '🔄 Syncing...';
+        document.getElementById('syncStatusBadge').innerText = 'Syncing...';
         document.getElementById('syncStatusBadge').style.background = '#fef7e0';
         document.getElementById('syncStatusBadge').style.color = '#b06000';
         try {
@@ -472,14 +500,14 @@
                 body: JSON.stringify(state)
             });
             if (res.ok) {
-                document.getElementById('syncStatusBadge').innerText = '☁️ Cloud Synced';
+                document.getElementById('syncStatusBadge').innerText = 'Cloud Synced';
                 document.getElementById('syncStatusBadge').style.background = '#e6f4ea';
                 document.getElementById('syncStatusBadge').style.color = '#137333';
             } else {
-                document.getElementById('syncStatusBadge').innerText = '⚠️ Sync Error';
+                document.getElementById('syncStatusBadge').innerText = 'Sync Error';
             }
         } catch (e) {
-            document.getElementById('syncStatusBadge').innerText = '⚠️ Offline';
+            document.getElementById('syncStatusBadge').innerText = 'Offline';
         }
     }
 
@@ -493,12 +521,12 @@
     async function initDashboard() {
         let loadedFromCloud = false;
         if (cloudConfig && cloudConfig.binId) {
-            document.getElementById('syncStatusBadge').innerText = '🔄 Connecting Cloud...';
+            document.getElementById('syncStatusBadge').innerText = 'Connecting Cloud...';
             const cloudState = await fetchCloudState();
             if (cloudState && cloudState.version === fileData.version) {
                 state = cloudState;
                 loadedFromCloud = true;
-                document.getElementById('syncStatusBadge').innerText = '☁️ Cloud Synced';
+                document.getElementById('syncStatusBadge').innerText = 'Cloud Synced';
                 document.getElementById('syncStatusBadge').style.background = '#e6f4ea';
                 document.getElementById('syncStatusBadge').style.color = '#137333';
             }
@@ -547,6 +575,7 @@
             renderTodosUI();
             renderAgendaUI();
             renderSpotlightUI();
+            renderEmailSummaryUI();
             alert('Successfully pulled latest state from cloud!');
         } else {
             alert('Failed to pull from cloud. Check your Bin ID and Master Key.');
@@ -565,17 +594,7 @@
 
     // 2. Weather Strip
     function renderWeatherStrip() {
-        const tl = (state.weatherConfig && state.weatherConfig.timeline) || [
-            { hour: 0, tempC: 11, condition: "Clear", type: "clear", cloudCover: 10, windKmh: 14 },
-            { hour: 3, tempC: 11, condition: "Clear", type: "clear", cloudCover: 12, windKmh: 15 },
-            { hour: 6, tempC: 12, condition: "Crisp", type: "clear", cloudCover: 15, windKmh: 18 },
-            { hour: 9, tempC: 15, condition: "Partly Cloudy", type: "partly_cloudy", cloudCover: 35, windKmh: 28 },
-            { hour: 12, tempC: 18, condition: "Windy", type: "windy", cloudCover: 55, windKmh: 44 },
-            { hour: 15, tempC: 14, condition: "Showers", type: "rain", cloudCover: 85, windKmh: 48 },
-            { hour: 18, tempC: 15, condition: "Clearing", type: "partly_cloudy", cloudCover: 40, windKmh: 25 },
-            { hour: 21, tempC: 12, condition: "Calm Dusk", type: "clear", cloudCover: 15, windKmh: 14 },
-            { hour: 23, tempC: 11, condition: "Starry Night", type: "clear", cloudCover: 10, windKmh: 12 }
-        ];
+        const tl = (state.weatherConfig && state.weatherConfig.timeline) || [];
         const strip = document.getElementById('compactWeatherStrip');
         strip.innerHTML = '';
 
@@ -609,14 +628,14 @@
             row.innerHTML = `
                 <div>
                     <span class="agenda-time">${ev.start} – ${ev.end}</span>
-                    <span style="margin-left: 10px;">${ev.title}</span>
+                    <span style="margin-left: 12px; font-weight: 500;">${ev.title}</span>
                 </div>
             `;
             listEl.appendChild(row);
         });
     }
 
-    // 4. Render Reorderable To-Do List
+    // 4. Render To-Do List
     function renderTodosUI() {
         const container = document.getElementById('todoListContainer');
         container.innerHTML = '';
@@ -632,8 +651,8 @@
                     <span class="todo-text">${todo.text}</span>
                 </div>
                 <div class="todo-actions">
-                    <button class="sketch-btn move-up" title="Move Up" ${idx === 0 ? 'disabled style="opacity:0.4;"' : ''}>▲</button>
-                    <button class="sketch-btn move-down" title="Move Down" ${idx === state.todos.length - 1 ? 'disabled style="opacity:0.4;"' : ''}>▼</button>
+                    <button class="sketch-btn move-up" title="Move Up" ${idx === 0 ? 'disabled style="opacity:0.4;"' : ''}>&uarr;</button>
+                    <button class="sketch-btn move-down" title="Move Down" ${idx === state.todos.length - 1 ? 'disabled style="opacity:0.4;"' : ''}>&darr;</button>
                     <button class="sketch-btn delete-task" title="Delete">&times;</button>
                 </div>
             `;
@@ -709,7 +728,7 @@
         const emails = state.emailSummary || [];
         document.getElementById('emailCountLabel').innerText = `${emails.length} relevant`;
         if (emails.length === 0) {
-            container.innerHTML = '<div style="color: #666; font-style: italic; padding: 6px;">No important emails in the past 24 hours.</div>';
+            container.innerHTML = '<div style="color: var(--text-secondary); font-style: italic; padding: 4px;">No important emails in the past 24 hours.</div>';
             return;
         }
         emails.forEach(em => {
@@ -720,10 +739,10 @@
             div.style.gap = '4px';
             div.innerHTML = `
                 <div style="display: flex; justify-content: space-between; width: 100%;">
-                    <strong>${em.title}</strong>
-                    <span style="font-size: 13px; color: #555; font-family: monospace;">${em.date}</span>
+                    <strong style="color: var(--text-primary);">${em.title}</strong>
+                    <span style="font-size: 13px; color: var(--text-secondary); font-family: monospace;">${em.date}</span>
                 </div>
-                <div style="font-size: 15px; color: #444;">${em.description}</div>
+                <div style="font-size: 14px; color: var(--text-secondary);">${em.description}</div>
             `;
             container.appendChild(div);
         });
