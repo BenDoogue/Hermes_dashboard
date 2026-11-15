@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CONNECT_FOUR // 2P STRATEGY ARENA</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #202124;
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h2 {
+            color: #202124;
+            margin-bottom: 5px;
+            font-size: 28px;
+        }
+        .google-sub {
+            font-size: 14px;
+            color: #5f6368;
+            margin-bottom: 15px;
+        }
+        .status-banner {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1a73e8;
+            margin: 15px 0;
+            background: #e8f0fe;
+            border: 1px solid #d2e3fc;
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 4px;
+        }
+        canvas {
+            border: 2px solid #1a73e8;
+            background: #1a73e8;
+            box-shadow: 0 4px 12px rgba(26,115,232,0.3);
+            display: block;
+            margin: 10px auto;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        .controls {
+            margin: 15px 0;
+        }
+        button {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+        }
+        button:hover {
+            background-color: #1557b0;
+        }
+        button.secondary {
+            background-color: #f1f3f4;
+            color: #3c4043;
+            border: 1px solid #dadce0;
+        }
+        button.secondary:hover {
+            background-color: #e8f0fe;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #1a0dab;
+            background: #f1f3f4;
+            border: 1px solid #dadce0;
+            padding: 8px 18px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .back-link:hover {
+            background: #e8f0fe;
+            border-color: #d2e3fc;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>CONNECT_FOUR.EXE</h2>
+    <div class="google-sub">Classic 2-Player Strategy Game &bull; Retro Google Edition</div>
+
+    <div class="status-banner" id="statusBanner">Player 1's Turn (Red)</div>
+
+    <canvas id="gameCanvas" width="560" height="480"></canvas>
+
+    <div class="controls">
+        <button onclick="resetGame()">Reset Board</button>
+    </div>
+
+    <div>
+        <a class="back-link" href="index.html">&larr; Return to Dashboard</a>
+    </div>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+const ROWS = 6;
+const COLS = 7;
+const CELL_SIZE = 80;
+
+let board = [];
+let currentPlayer = 1; // 1 = Red, 2 = Yellow
+let gameOver = false;
+let winningCells = [];
+
+function initBoard() {
+    board = [];
+    for (let r = 0; r < ROWS; r++) {
+        let row = [];
+        for (let c = 0; c < COLS; c++) {
+            row.push(0);
+        }
+        board.push(row);
+    }
+    currentPlayer = 1;
+    gameOver = false;
+    winningCells = [];
+    updateStatus();
+    draw();
+}
+
+function updateStatus() {
+    let banner = document.getElementById("statusBanner");
+    if (gameOver) return;
+    if (currentPlayer === 1) {
+        banner.innerText = "Player 1's Turn (Red)";
+        banner.style.color = "#ea4335";
+        banner.style.background = "#fce8e6";
+        banner.style.borderColor = "#fadcda";
+    } else {
+        banner.innerText = "Player 2's Turn (Yellow)";
+        banner.style.color = "#b06000";
+        banner.style.background = "#fef7e0";
+        banner.style.borderColor = "#fce8b2";
+    }
+}
+
+canvas.addEventListener("click", function(e) {
+    if (gameOver) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const col = Math.floor(x / CELL_SIZE);
+
+    if (col >= 0 && col < COLS) {
+        // Find lowest empty row in this column
+        for (let r = ROWS - 1; r >= 0; r--) {
+            if (board[r][col] === 0) {
+                board[r][col] = currentPlayer;
+                
+                if (checkWin(r, col)) {
+                    gameOver = true;
+                    let banner = document.getElementById("statusBanner");
+                    banner.innerText = `Player ${currentPlayer} (${currentPlayer === 1 ? 'Red' : 'Yellow'}) WINS!`;
+                    banner.style.color = "#137333";
+                    banner.style.background = "#e6f4ea";
+                    banner.style.borderColor = "#ceead6";
+                } else if (checkDraw()) {
+                    gameOver = true;
+                    let banner = document.getElementById("statusBanner");
+                    banner.innerText = "It's a Draw!";
+                    banner.style.color = "#5f6368";
+                    banner.style.background = "#f1f3f4";
+                    banner.style.borderColor = "#dadce0";
+                } else {
+                    currentPlayer = currentPlayer === 1 ? 2 : 1;
+                    updateStatus();
+                }
+                draw();
+                break;
+            }
+        }
+    }
+});
+
+function checkWin(r, c) {
+    let player = board[r][c];
+
+    // Directions: [dr, dc]
+    let directions = [
+        [[0, 1], [0, -1]],   // Horizontal
+        [[1, 0], [-1, 0]],   // Vertical
+        [[1, 1], [-1, -1]],  // Diagonal \
+        [[1, -1], [-1, 1]]   // Diagonal /
+    ];
+
+    for (let dir of directions) {
+        let count = 1;
+        let line = [{r, c}];
+
+        for (let [dr, dc] of dir) {
+            let nr = r + dr;
+            let nc = c + dc;
+            while (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && board[nr][nc] === player) {
+                count++;
+                line.push({r: nr, c: nc});
+                nr += dr;
+                nc += dc;
+            }
+        }
+
+        if (count >= 4) {
+            winningCells = line;
+            return true;
+        }
+    }
+    return false;
+}
+
+function checkDraw() {
+    for (let c = 0; c < COLS; c++) {
+        if (board[0][c] === 0) return false;
+    }
+    return true;
+}
+
+function draw() {
+    ctx.fillStyle = "#1a73e8";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+            let x = c * CELL_SIZE + CELL_SIZE / 2;
+            let y = r * CELL_SIZE + CELL_SIZE / 2;
+            let radius = CELL_SIZE / 2 - 8;
+
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+
+            let val = board[r][c];
+            if (val === 0) {
+                ctx.fillStyle = "#ffffff";
+            } else if (val === 1) {
+                ctx.fillStyle = "#ea4335";
+            } else if (val === 2) {
+                ctx.fillStyle = "#fbbc05";
+            }
+            ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = "#1557b0";
+            ctx.stroke();
+
+            // Highlight winning chips
+            if (winningCellMatch(r, c)) {
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = "#ffffff";
+                ctx.stroke();
+            }
+        }
+    }
+}
+
+function winningCellMatch(r, c) {
+    return winningCells.some(cell => cell.r === r && cell.c === c);
+}
+
+function resetGame() {
+    initBoard();
+}
+
+// Initial draw
+initBoard();
+</script>
+
+</body>
+</html>
