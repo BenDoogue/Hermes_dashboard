@@ -716,30 +716,38 @@
             ctx.fillText(p.name, px + 8, py + 3);
         });
 
-        // Ben's moving marker
-        const benProgress = (t * 4) % 1;
-        const startX = width * 0.35, startY = height * 0.40;
-        const midX = width * 0.45, midY = height * 0.48;
-        const endX = width * 0.55, endY = height * 0.42;
+        // Ben's real-time daily itinerary waypoints across Wellington
+        const waypoints = [
+            { t: 0.00, x: 0.30, y: 0.60, loc: 'Home' },
+            { t: 0.32, x: 0.35, y: 0.40, loc: 'University / Kelburn' },
+            { t: 0.45, x: 0.42, y: 0.48, loc: 'Cuba Street (Lunch)' },
+            { t: 0.60, x: 0.55, y: 0.42, loc: 'Te Papa (Afternoon)' },
+            { t: 0.75, x: 0.62, y: 0.30, loc: 'Mt Victoria (Evening Walk)' },
+            { t: 0.88, x: 0.45, y: 0.35, loc: 'CBD Return' },
+            { t: 1.00, x: 0.30, y: 0.60, loc: 'Home' }
+        ];
 
-        let benX = startX, benY = startY;
-        if (benProgress < 0.5) {
-            const subT = benProgress * 2;
-            benX = startX + (midX - startX) * subT;
-            benY = startY + (midY - startY) * subT;
-        } else {
-            const subT = (benProgress - 0.5) * 2;
-            benX = midX + (endX - midX) * subT;
-            benY = midY + (endY - midY) * subT;
+        let wp1 = waypoints[0], wp2 = waypoints[1];
+        for (let i = 0; i < waypoints.length - 1; i++) {
+            if (t >= waypoints[i].t && t <= waypoints[i+1].t) {
+                wp1 = waypoints[i];
+                wp2 = waypoints[i+1];
+                break;
+            }
         }
+        const segDur = wp2.t - wp1.t;
+        const segProg = segDur > 0 ? (t - wp1.t) / segDur : 0;
+        const benX = width * (wp1.x + (wp2.x - wp1.x) * segProg);
+        const benY = height * (wp1.y + (wp2.y - wp1.y) * segProg);
 
+        // Draw Ben's pulse marker and location status
         ctx.beginPath();
-        ctx.arc(benX, benY, 8 + Math.sin(Date.now() * 0.01) * 2, 0, Math.PI * 2);
+        ctx.arc(benX, benY, 9 + Math.sin(Date.now() * 0.01) * 2, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(26, 115, 232, 0.3)';
         ctx.fill();
 
         ctx.beginPath();
-        ctx.arc(benX, benY, 5, 0, Math.PI * 2);
+        ctx.arc(benX, benY, 5.5, 0, Math.PI * 2);
         ctx.fillStyle = '#1a73e8';
         ctx.fill();
         ctx.lineWidth = 2;
@@ -748,7 +756,7 @@
 
         ctx.fillStyle = '#1a73e8';
         ctx.font = 'bold 10px Arial';
-        ctx.fillText('Ben (You)', benX + 10, benY - 5);
+        ctx.fillText('Ben: ' + wp1.loc, benX + 12, benY - 4);
 
         // Wind / weather particles
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
