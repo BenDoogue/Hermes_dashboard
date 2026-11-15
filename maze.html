@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MAZE_GENERATOR // RETRO GOOGLE STYLE</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #202124;
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h2 {
+            color: #202124;
+            margin-bottom: 5px;
+            font-size: 28px;
+        }
+        .google-sub {
+            font-size: 14px;
+            color: #5f6368;
+            margin-bottom: 15px;
+        }
+        canvas {
+            border: 1px solid #dadce0;
+            background: #ffffff;
+            box-shadow: 0 1px 6px rgba(32,33,36,.28);
+            display: block;
+            margin: 20px auto;
+            border-radius: 8px;
+        }
+        .controls {
+            margin: 15px 0;
+        }
+        button {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+        }
+        button:hover {
+            background-color: #1557b0;
+        }
+        button.secondary {
+            background-color: #f1f3f4;
+            color: #3c4043;
+            border: 1px solid #dadce0;
+        }
+        button.secondary:hover {
+            background-color: #e8f0fe;
+        }
+        .stats {
+            font-size: 13px;
+            color: #5f6368;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #1a0dab;
+            background: #f1f3f4;
+            border: 1px solid #dadce0;
+            padding: 8px 18px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .back-link:hover {
+            background: #e8f0fe;
+            border-color: #d2e3fc;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>MAZE_GENERATOR.SYS</h2>
+    <div class="google-sub">Procedural DFS Maze Generator &bull; Retro Google Edition</div>
+
+    <div class="controls">
+        <button onclick="generateNewMaze()">Generate New Maze</button>
+        <button class="secondary" onclick="solveMaze()">Solve Maze</button>
+    </div>
+
+    <canvas id="mazeCanvas" width="450" height="450"></canvas>
+
+    <div class="stats" id="stats">GRID: 20 x 20 &bull; STATUS: READY</div>
+
+    <div>
+        <a class="back-link" href="index.html">&larr; Return to Dashboard</a>
+    </div>
+
+<script>
+const canvas = document.getElementById("mazeCanvas");
+const ctx = canvas.getContext("2d");
+
+const cols = 25;
+const rows = 25;
+const cellSize = canvas.width / cols;
+let grid = [];
+let stack = [];
+let current;
+let isGenerating = false;
+let solutionPath = [];
+
+class Cell {
+    constructor(r, c) {
+        this.r = r;
+        this.c = c;
+        // Walls: top, right, bottom, left
+        this.walls = [true, true, true, true];
+        this.visited = false;
+    }
+
+    draw() {
+        let x = this.c * cellSize;
+        let y = this.r * cellSize;
+
+        ctx.strokeStyle = "#4285F4";
+        ctx.lineWidth = 2;
+
+        if (this.walls[0]) { ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + cellSize, y); ctx.stroke(); }
+        if (this.walls[1]) { ctx.beginPath(); ctx.moveTo(x + cellSize, y); ctx.lineTo(x + cellSize, y + cellSize); ctx.stroke(); }
+        if (this.walls[2]) { ctx.beginPath(); ctx.moveTo(x + cellSize, y + cellSize); ctx.lineTo(x, y + cellSize); ctx.stroke(); }
+        if (this.walls[3]) { ctx.beginPath(); ctx.moveTo(x, y + cellSize); ctx.lineTo(x, y); ctx.stroke(); }
+
+        if (this.visited) {
+            ctx.fillStyle = "#f8f9fa";
+            ctx.fillRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
+        }
+    }
+
+    highlight() {
+        let x = this.c * cellSize;
+        let y = this.r * cellSize;
+        ctx.fillStyle = "#FBBC05";
+        ctx.fillRect(x + 2, y + 2, cellSize - 4, cellSize - 4);
+    }
+}
+
+function index(r, c) {
+    if (r < 0 || c < 0 || r >= rows || c >= cols) return -1;
+    return c + r * cols;
+}
+
+function initGrid() {
+    grid = [];
+    solutionPath = [];
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            grid.push(new Cell(r, c));
+        }
+    }
+    current = grid[0];
+    current.visited = true;
+}
+
+function checkNeighbors(cell) {
+    let neighbors = [];
+    let r = cell.r;
+    let c = cell.c;
+
+    let top = grid[index(r - 1, c)];
+    let right = grid[index(r, c + 1)];
+    let bottom = grid[index(r + 1, c)];
+    let left = grid[index(r, c - 1)];
+
+    if (top && !top.visited) neighbors.push(top);
+    if (right && !right.visited) neighbors.push(right);
+    if (bottom && !bottom.visited) neighbors.push(bottom);
+    if (left && !left.visited) neighbors.push(left);
+
+    if (neighbors.length > 0) {
+        let rand = Math.floor(Math.random() * neighbors.length);
+        return neighbors[rand];
+    }
+    return undefined;
+}
+
+function removeWalls(a, b) {
+    let x = a.c - b.c;
+    if (x === 1) {
+        a.walls[3] = false;
+        b.walls[1] = false;
+    } else if (x === -1) {
+        a.walls[1] = false;
+        b.walls[3] = false;
+    }
+    let y = a.r - b.r;
+    if (y === 1) {
+        a.walls[0] = false;
+        b.walls[2] = false;
+    } else if (y === -1) {
+        a.walls[2] = false;
+        b.walls[0] = false;
+    }
+}
+
+function generateNewMaze() {
+    initGrid();
+    stack = [];
+    isGenerating = true;
+    document.getElementById("stats").innerText = `GRID: ${cols} x ${rows} \u2022 STATUS: GENERATING...`;
+    stepMaze();
+}
+
+function stepMaze() {
+    if (!isGenerating) return;
+
+    let next = checkNeighbors(current);
+    if (next) {
+        next.visited = true;
+        stack.push(current);
+        removeWalls(current, next);
+        current = next;
+    } else if (stack.length > 0) {
+        current = stack.pop();
+    } else {
+        isGenerating = false;
+        // Mark Start and End
+        document.getElementById("stats").innerText = `GRID: ${cols} x ${rows} \u2022 STATUS: COMPLETE`;
+        drawMaze();
+        return;
+    }
+
+    drawMaze();
+    current.highlight();
+    requestAnimationFrame(stepMaze);
+}
+
+function drawMaze() {
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = 0; i < grid.length; i++) {
+        grid[i].draw();
+    }
+
+    // Draw start (top-left) and end (bottom-right) markers
+    ctx.fillStyle = "#34A853";
+    ctx.fillRect(2, 2, cellSize - 4, cellSize - 4);
+
+    ctx.fillStyle = "#EA4335";
+    ctx.fillRect((cols - 1) * cellSize + 2, (rows - 1) * cellSize + 2, cellSize - 4, cellSize - 4);
+
+    // Draw solution if exists
+    if (solutionPath.length > 0) {
+        ctx.strokeStyle = "#EA4335";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        for (let i = 0; i < solutionPath.length; i++) {
+            let cell = solutionPath[i];
+            let x = cell.c * cellSize + cellSize / 2;
+            let y = cell.r * cellSize + cellSize / 2;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+    }
+}
+
+function solveMaze() {
+    if (isGenerating) return;
+    // BFS or DFS to solve from top-left (0,0) to bottom-right (cols-1, rows-1)
+    let queue = [[grid[0]]];
+    let visited = new Set();
+    visited.add(grid[0]);
+    let foundPath = null;
+
+    while (queue.length > 0) {
+        let path = queue.shift();
+        let node = path[path.length - 1];
+
+        if (node.r === rows - 1 && node.c === cols - 1) {
+            foundPath = path;
+            break;
+        }
+
+        let r = node.r;
+        let c = node.c;
+
+        // Check top
+        if (!node.walls[0]) {
+            let nextCell = grid[index(r - 1, c)];
+            if (nextCell && !visited.has(nextCell)) {
+                visited.add(nextCell);
+                queue.push([...path, nextCell]);
+            }
+        }
+        // Check right
+        if (!node.walls[1]) {
+            let nextCell = grid[index(r, c + 1)];
+            if (nextCell && !visited.has(nextCell)) {
+                visited.add(nextCell);
+                queue.push([...path, nextCell]);
+            }
+        }
+        // Check bottom
+        if (!node.walls[2]) {
+            let nextCell = grid[index(r + 1, c)];
+            if (nextCell && !visited.has(nextCell)) {
+                visited.add(nextCell);
+                queue.push([...path, nextCell]);
+            }
+        }
+        // Check left
+        if (!node.walls[3]) {
+            let nextCell = grid[index(r, c - 1)];
+            if (nextCell && !visited.has(nextCell)) {
+                visited.add(nextCell);
+                queue.push([...path, nextCell]);
+            }
+        }
+    }
+
+    if (foundPath) {
+        solutionPath = foundPath;
+        document.getElementById("stats").innerText = `GRID: ${cols} x ${rows} \u2022 STATUS: SOLVED (${solutionPath.length} steps)`;
+    } else {
+        document.getElementById("stats").innerText = `GRID: ${cols} x ${rows} \u2022 STATUS: NO SOLUTION FOUND`;
+    }
+    drawMaze();
+}
+
+// Initial generation on load
+generateNewMaze();
+</script>
+
+</body>
+</html>
