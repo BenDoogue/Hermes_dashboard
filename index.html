@@ -320,6 +320,17 @@
         </div>
     </div>
 
+    <!-- EMAIL SUMMARY (PAST 24HRS) -->
+    <div class="sketch-card">
+        <div class="card-header">
+            <span>✉️ Important Email Summary (Past 24hrs)</span>
+            <span style="font-size: 15px; font-weight: normal; color: #555;" id="emailCountLabel">0 emails</span>
+        </div>
+        <div id="emailSummaryContainer">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
     <!-- DAILY SPOTLIGHT -->
     <div class="sketch-card">
         <div class="card-header">
@@ -329,6 +340,7 @@
         <div style="font-size: 17px; line-height: 1.5; display: flex; flex-direction: column; gap: 8px;">
             <div><strong>🎯 Morning Task:</strong> <span id="spotlightMorningTask">Execute today's schedule smoothly: 39 The Terrace work, Willis St presentation, and home to Essex St.</span></div>
             <div><strong>🧠 Fact of the Day:</strong> <span id="spotlightFact">Predictive coding theory suggests the brain isn't a passive feature detector — it continuously predicts incoming sensory signals and updates internal models only on surprise (prediction error).</span></div>
+            <div><strong>📜 History Fact:</strong> <span id="spotlightHistoryFact"></span></div>
             <div><strong>📖 Word of the Day:</strong> <strong id="spotlightWordTerm">Affordance</strong> — <span id="spotlightWordDef">In cognitive science & design, an action possibility directly offered by the environment to an agent.</span></div>
         </div>
     </div>
@@ -416,7 +428,8 @@
             dayPlan: JSON.parse(JSON.stringify(fileData.dayPlan || [])),
             todos: JSON.parse(JSON.stringify(fileData.todos || [])),
             dailySpotlight: JSON.parse(JSON.stringify(fileData.dailySpotlight || {})),
-            weatherConfig: JSON.parse(JSON.stringify(fileData.weather || {}))
+            weatherConfig: JSON.parse(JSON.stringify(fileData.weather || {})),
+            emailSummary: JSON.parse(JSON.stringify(fileData.emailSummary || []))
         };
     }
 
@@ -509,6 +522,7 @@
         renderAgendaUI();
         renderTodosUI();
         renderSpotlightUI();
+        renderEmailSummaryUI();
     }
 
     // Save Cloud Config
@@ -682,9 +696,37 @@
         document.getElementById('spotlightTopicLabel').innerText = sp.interestTopic || 'Daily Focus';
         document.getElementById('spotlightMorningTask').innerText = sp.morningTask || '';
         document.getElementById('spotlightFact').innerText = sp.factOfTheDay || '';
+        document.getElementById('spotlightHistoryFact').innerText = sp.historyFact || '';
         const w = sp.wordOfTheDay || {};
         document.getElementById('spotlightWordTerm').innerText = w.term || '';
         document.getElementById('spotlightWordDef').innerText = w.definition || '';
+    }
+
+    // 6. Email Summary UI
+    function renderEmailSummaryUI() {
+        const container = document.getElementById('emailSummaryContainer');
+        container.innerHTML = '';
+        const emails = state.emailSummary || [];
+        document.getElementById('emailCountLabel').innerText = `${emails.length} relevant`;
+        if (emails.length === 0) {
+            container.innerHTML = '<div style="color: #666; font-style: italic; padding: 6px;">No important emails in the past 24 hours.</div>';
+            return;
+        }
+        emails.forEach(em => {
+            const div = document.createElement('div');
+            div.className = 'agenda-row';
+            div.style.flexDirection = 'column';
+            div.style.alignItems = 'flex-start';
+            div.style.gap = '4px';
+            div.innerHTML = `
+                <div style="display: flex; justify-content: space-between; width: 100%;">
+                    <strong>${em.title}</strong>
+                    <span style="font-size: 13px; color: #555; font-family: monospace;">${em.date}</span>
+                </div>
+                <div style="font-size: 15px; color: #444;">${em.description}</div>
+            `;
+            container.appendChild(div);
+        });
     }
 
     initDashboard();

@@ -67,10 +67,17 @@ window.BRIEFING_DATA = {
         interestTopic: "Cognitive Science & Autonomous AI",
         morningTask: "Execute today's schedule smoothly: 39 The Terrace work, Willis St presentation, and home to Essex St.",
         factOfTheDay: "Predictive coding theory suggests the brain isn't a passive feature detector — it continuously predicts incoming sensory signals and updates internal models only on surprise (prediction error).",
+        historyFact: "On 15 November 1860, the first telegraph line in New Zealand opened connecting Christchurch and Lyttelton.",
         wordOfTheDay: {
             term: "Affordance",
             pronunciation: "/əˈfɔːdəns/",
             definition: "In cognitive science & design (J.J. Gibson), an action possibility directly offered by the environment to an agent."
         }
-    }
+    },
+
+    // Email Summary (Past 24hrs)
+    emailSummary: [
+        { date: "15 Nov 2026, 04:30", title: "GitHub Security Alert", description: "Dependabot update alert for repository dependencies.", important: true },
+        { date: "14 Nov 2026, 22:15", title: "Wellington AI meetup confirmation", description: "Your RSVP for Tuesday's meetup at BizDojo is confirmed.", important: true }
+    ]
 };
