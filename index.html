@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>⚡ HERMES_DASHBOARD.SYS v1.0 ⚡</title>
+    <style>
+        body {
+            background-color: #000000;
+            color: #00ff00;
+            font-family: "Courier New", Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            background-image: radial-gradient(circle, #001100 0%, #000000 90%);
+            background-attachment: fixed;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 2px dashed #00ff00;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+            background: rgba(0, 20, 0, 0.85);
+        }
+        h1, h2, h3 {
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px #00ff00;
+        }
+        hr {
+            border: 1px dashed #00ff00;
+            margin: 20px 0;
+        }
+        .blink {
+            animation: blinker 1s linear infinite;
+        }
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #00ff00;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #003300;
+        }
+        a {
+            color: #ffff00;
+            text-decoration: none;
+        }
+        a:hover {
+            background-color: #ffff00;
+            color: #000000;
+        }
+        .ascii-art {
+            white-space: pre;
+            font-size: 10px;
+            line-height: 10px;
+            color: #00ff00;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .counter {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            border-top: 1px dotted #00ff00;
+            padding-top: 10px;
+        }
+        .visitor-box {
+            background: #002200;
+            padding: 2px 6px;
+            border: 1px solid #00ff00;
+            font-weight: bold;
+            color: #ffff00;
+        }
+        /* Retro chart styling */
+        .chart-container {
+            margin-top: 20px;
+            border: 1px solid #00ff00;
+            padding: 15px;
+            background: #000800;
+        }
+        .bar-row {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+        .bar-label {
+            width: 120px;
+            font-size: 12px;
+        }
+        .bar-track {
+            flex-grow: 1;
+            background: #001100;
+            border: 1px solid #00ff00;
+            height: 18px;
+            position: relative;
+        }
+        .bar-fill {
+            background: #00ff00;
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        .bar-value {
+            position: absolute;
+            right: 5px;
+            top: 0;
+            font-size: 11px;
+            color: #000;
+            font-weight: bold;
+            line-height: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="ascii-art">
+ _  _ ____ ____ _  _ ____    ___  ____ ____ _  _ ____ _  _ ___  ____ ____ 
+ |__| |___ |__/ |\/| |___    |  \ |__| [__  |__| |___ |__| |__] |___ |__/ 
+ |  | |___ |  \ |  | |___    |__/ |__| ___] |  | |___ |  | |__] |___ |  \ 
+    </div>
+
+    <marquee scrollamount="4">*** WELCOME TO BEN'S RETRO COMMAND CENTER // SYSTEM ONLINE // STATUS: OPTIMAL ***</marquee>
+    
+    <hr>
+
+    <h3>[ SYSTEM STATUS & METRICS ]</h3>
+    <p>Last Updated: <span id="timestamp">LOADING...</span> <span class="blink">_</span></p>
+
+    <div class="chart-container">
+        <h4>DAILY METRICS BAR_OMETER</h4>
+        
+        <div class="bar-row">
+            <div class="bar-label">Token Usage</div>
+            <div class="bar-track">
+                <div class="bar-fill" style="width: 45%;"></div>
+                <span class="bar-value">45%</span>
+            </div>
+        </div>
+
+        <div class="bar-row">
+            <div class="bar-label">Task Velocity</div>
+            <div class="bar-track">
+                <div class="bar-fill" style="width: 80%;"></div>
+                <span class="bar-value">80%</span>
+            </div>
+        </div>
+
+        <div class="bar-row">
+            <div class="bar-label">System Health</div>
+            <div class="bar-track">
+                <div class="bar-fill" style="width: 99%;"></div>
+                <span class="bar-value">99%</span>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <h3>[ PROJECT DIRECTORY ]</h3>
+    <table>
+        <tr>
+            <th>PROJECT_ID</th>
+            <th>DESCRIPTION</th>
+            <th>STATUS</th>
+            <th>LINK</th>
+        </tr>
+        <tr>
+            <td><b>Hermes Agent</b></td>
+            <td>Autonomous AI Agent framework</td>
+            <td>ACTIVE</td>
+            <td><a href="https://github.com/NousResearch/hermes-agent" target="_blank">[ACCESS]</a></td>
+        </tr>
+        <tr>
+            <td><b>Dashboard_SYS</b></td>
+            <td>Retro personal command center</td>
+            <td>ONLINE</td>
+            <td><a href="#" onclick="alert('You are already here, user.'); return false;">[ACCESS]</a></td>
+        </tr>
+        <tr>
+            <td><b>Personal Notes</b></td>
+            <td>Knowledge base & docs</td>
+            <td>SYNCED</td>
+            <td><a href="#" target="_blank">[ACCESS]</a></td>
+        </tr>
+    </table>
+
+    <div class="counter">
+        VISITOR COUNT: <span class="visitor-box">0001337</span> | PROTOCOL: HTTP/1.0 CRT-MONITOR
+    </div>
+</div>
+
+<script>
+    // Update timestamp live
+    document.getElementById('timestamp').innerText = new Date().toUTCString();
+</script>
+
+</body>
+</html>
