@@ -220,7 +220,7 @@
 
     <details class="collapsible-menu" open>
         <summary>
-            <span>📂 Project Directory & Interactive Links</span>
+            <span>🎮 Interactive Games & Apps</span>
             <span style="font-size: 12px; color: #5f6368; font-weight: normal;">[Click to collapse/expand]</span>
         </summary>
         <div class="menu-content">
@@ -230,18 +230,6 @@
                     <th>DESCRIPTION</th>
                     <th>STATUS</th>
                     <th>ACTION</th>
-                </tr>
-                <tr>
-                    <td><b>Hermes Agent</b></td>
-                    <td>Autonomous AI Agent framework</td>
-                    <td><span class="badge badge-active">ACTIVE</span></td>
-                    <td><a href="https://github.com/NousResearch/hermes-agent" target="_blank">Access &rarr;</a></td>
-                </tr>
-                <tr>
-                    <td><b>Dashboard_SYS</b></td>
-                    <td>Retro personal command center</td>
-                    <td><span class="badge badge-online">ONLINE</span></td>
-                    <td><a href="#" onclick="alert('You are already here, user.'); return false;">Current</a></td>
                 </tr>
                 <tr>
                     <td><b>Flappy Hermes</b></td>
@@ -279,6 +267,35 @@
                     <td><span class="badge badge-active">OPPORTUNITIES</span></td>
                     <td><a href="jobs.html">View Board &rarr;</a></td>
                 </tr>
+            </table>
+        </div>
+    </details>
+
+    <details class="collapsible-menu" open style="margin-top: 15px;">
+        <summary>
+            <span>⚙️ Hermes, Dashboard & Personal Notes</span>
+            <span style="font-size: 12px; color: #5f6368; font-weight: normal;">[Click to collapse/expand]</span>
+        </summary>
+        <div class="menu-content">
+            <table>
+                <tr>
+                    <th>PROJECT_ID</th>
+                    <th>DESCRIPTION</th>
+                    <th>STATUS</th>
+                    <th>ACTION</th>
+                </tr>
+                <tr>
+                    <td><b>Hermes Agent</b></td>
+                    <td>Autonomous AI Agent framework</td>
+                    <td><span class="badge badge-active">ACTIVE</span></td>
+                    <td><a href="https://github.com/NousResearch/hermes-agent" target="_blank">Access &rarr;</a></td>
+                </tr>
+                <tr>
+                    <td><b>Dashboard_SYS</b></td>
+                    <td>Retro personal command center</td>
+                    <td><span class="badge badge-online">ONLINE</span></td>
+                    <td><a href="#" onclick="alert('You are already here, user.'); return false;">Current</a></td>
+                </tr>
                 <tr>
                     <td><b>Personal Notes</b></td>
                     <td>Knowledge base & docs</td>
@@ -295,7 +312,17 @@
 </div>
 
 <script>
-    document.getElementById('timestamp').innerText = new Date().toUTCString();
+    const nzTime = new Date().toLocaleString('en-NZ', {
+        timeZone: 'Pacific/Auckland',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        timeZoneName: 'short'
+    });
+    document.getElementById('timestamp').innerText = nzTime;
 </script>
 
 </body>
