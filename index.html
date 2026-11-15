@@ -52,6 +52,11 @@
             font-size: 15px;
             color: #2c2c2c;
             margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         h2, h3 {
             font-family: 'Caveat', cursive, sans-serif;
@@ -80,7 +85,7 @@
             font-size: 19px;
             font-family: 'Caveat', cursive, sans-serif;
         }
-        /* Compact Weather Strip (Icons + Time, No map, No animation) */
+        /* Compact Weather Strip */
         .weather-strip-compact {
             display: grid;
             grid-template-columns: repeat(9, 1fr);
@@ -181,6 +186,37 @@
             color: #1a73e8;
             font-family: 'Courier New', monospace;
         }
+        /* Cloud Sync Panel inside Collapsible Details */
+        details.cloud-sync-drawer {
+            border: 1.5px dashed #2c2c2c;
+            border-radius: 12px;
+            background: #f7f3e8;
+            margin-bottom: 20px;
+            padding: 10px 15px;
+        }
+        details.cloud-sync-drawer summary {
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Caveat', cursive;
+            font-size: 20px;
+            outline: none;
+        }
+        .sync-form-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .sync-form-row input {
+            flex: 1;
+            min-width: 140px;
+            padding: 6px 10px;
+            border: 1.5px solid #2c2c2c;
+            border-radius: 8px;
+            font-family: 'Patrick Hand', cursive;
+            font-size: 15px;
+            background: #fffefb;
+        }
         /* Notebook Table for Games */
         table {
             width: 100%;
@@ -229,10 +265,25 @@
     <div class="dashboard-subtitle">~ Paper Sketch & Notebook Edition ~</div>
 
     <div class="status-bar">
-        SYSTEM STATUS: ONLINE &bull; WELLINGTON LOCAL TIME: <span id="timestamp">LOADING...</span>
+        <div>SYSTEM STATUS: ONLINE &bull; WELLINGTON TIME: <span id="timestamp">LOADING...</span></div>
+        <div><span id="syncStatusBadge" class="badge" style="background: #e8f0fe; color: #1a73e8;">☁️ Local Storage</span></div>
     </div>
 
-    <!-- DAILY WEATHER STRIP (Icons + Time, No map, No animation) -->
+    <!-- CLOUD SYNC CONFIG DRAWER (For Cross-Device Sync) -->
+    <details class="cloud-sync-drawer">
+        <summary>☁️ Enable Cross-Device Cloud Sync (JSONbin.io)</summary>
+        <div style="font-size: 15px; margin-top: 8px; color: #444; line-height: 1.4;">
+            Want your todos and schedule to sync across your phone, tablet, and laptop? Create a free bin on <a href="https://jsonbin.io" target="_blank">jsonbin.io</a>, paste your <b>Bin ID</b> and <b>Master Key</b> below, and click Save!
+        </div>
+        <div class="sync-form-row">
+            <input type="text" id="syncBinIdInput" placeholder="JSONbin Bin ID">
+            <input type="password" id="syncApiKeyInput" placeholder="JSONbin Master Key ($2a$10$...)">
+            <button class="sketch-btn" id="saveSyncConfigBtn">Save & Sync</button>
+            <button class="sketch-btn" id="testSyncBtn" style="background:#e8f0fe;">🔄 Force Pull</button>
+        </div>
+    </details>
+
+    <!-- DAILY WEATHER STRIP -->
     <div class="sketch-card">
         <div class="card-header">
             <span>⛅ Wellington Weather Forecast (Today)</span>
@@ -356,7 +407,7 @@
     setInterval(updateSystemTimestamp, 1000);
 
     const fileData = window.BRIEFING_DATA || {};
-    const STORAGE_KEY = 'hermes_notebook_state_v1';
+    const STORAGE_KEY = 'hermes_notebook_state_v2';
     let state = null;
 
     function buildFreshState() {
@@ -369,21 +420,124 @@
         };
     }
 
-    try {
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-        if (saved && saved.version === fileData.version) {
-            state = saved;
-        } else {
-            state = buildFreshState();
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        }
-    } catch (e) {
-        state = buildFreshState();
+    // Cloud Sync Setup
+    let cloudConfig = JSON.parse(localStorage.getItem('hermes_cloud_config') || 'null');
+    if (cloudConfig) {
+        document.getElementById('syncBinIdInput').value = cloudConfig.binId || '';
+        document.getElementById('syncApiKeyInput').value = cloudConfig.apiKey || '';
     }
 
-    function persistState() {
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    async function fetchCloudState() {
+        if (!cloudConfig || !cloudConfig.binId) return null;
+        try {
+            const res = await fetch(`https://api.jsonbin.io/v3/b/${cloudConfig.binId}/latest`, {
+                headers: { 'X-Master-Key': cloudConfig.apiKey }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                return data.record;
+            }
+        } catch (e) {
+            console.error('Cloud fetch failed', e);
+        }
+        return null;
     }
+
+    let syncTimeout = null;
+    async function pushCloudState() {
+        if (!cloudConfig || !cloudConfig.binId) return;
+        document.getElementById('syncStatusBadge').innerText = '🔄 Syncing...';
+        document.getElementById('syncStatusBadge').style.background = '#fef7e0';
+        document.getElementById('syncStatusBadge').style.color = '#b06000';
+        try {
+            const res = await fetch(`https://api.jsonbin.io/v3/b/${cloudConfig.binId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': cloudConfig.apiKey
+                },
+                body: JSON.stringify(state)
+            });
+            if (res.ok) {
+                document.getElementById('syncStatusBadge').innerText = '☁️ Cloud Synced';
+                document.getElementById('syncStatusBadge').style.background = '#e6f4ea';
+                document.getElementById('syncStatusBadge').style.color = '#137333';
+            } else {
+                document.getElementById('syncStatusBadge').innerText = '⚠️ Sync Error';
+            }
+        } catch (e) {
+            document.getElementById('syncStatusBadge').innerText = '⚠️ Offline';
+        }
+    }
+
+    function queueCloudSync() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+        if (!cloudConfig || !cloudConfig.binId) return;
+        clearTimeout(syncTimeout);
+        syncTimeout = setTimeout(pushCloudState, 1000);
+    }
+
+    async function initDashboard() {
+        let loadedFromCloud = false;
+        if (cloudConfig && cloudConfig.binId) {
+            document.getElementById('syncStatusBadge').innerText = '🔄 Connecting Cloud...';
+            const cloudState = await fetchCloudState();
+            if (cloudState && cloudState.version === fileData.version) {
+                state = cloudState;
+                loadedFromCloud = true;
+                document.getElementById('syncStatusBadge').innerText = '☁️ Cloud Synced';
+                document.getElementById('syncStatusBadge').style.background = '#e6f4ea';
+                document.getElementById('syncStatusBadge').style.color = '#137333';
+            }
+        }
+
+        if (!loadedFromCloud) {
+            try {
+                const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+                if (saved && saved.version === fileData.version) {
+                    state = saved;
+                } else {
+                    state = buildFreshState();
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+                }
+            } catch (e) {
+                state = buildFreshState();
+            }
+        }
+
+        renderWeatherStrip();
+        renderAgendaUI();
+        renderTodosUI();
+        renderSpotlightUI();
+    }
+
+    // Save Cloud Config
+    document.getElementById('saveSyncConfigBtn').addEventListener('click', async () => {
+        const binId = document.getElementById('syncBinIdInput').value.trim();
+        const apiKey = document.getElementById('syncApiKeyInput').value.trim();
+        if (!binId || !apiKey) {
+            alert('Please enter both Bin ID and Master Key.');
+            return;
+        }
+        cloudConfig = { provider: 'jsonbin', binId, apiKey };
+        localStorage.setItem('hermes_cloud_config', JSON.stringify(cloudConfig));
+        await pushCloudState();
+        alert('Cloud sync configured successfully!');
+    });
+
+    document.getElementById('testSyncBtn').addEventListener('click', async () => {
+        const cloudState = await fetchCloudState();
+        if (cloudState) {
+            state = cloudState;
+            queueCloudSync();
+            renderTodosUI();
+            renderAgendaUI();
+            renderSpotlightUI();
+            alert('Successfully pulled latest state from cloud!');
+        } else {
+            alert('Failed to pull from cloud. Check your Bin ID and Master Key.');
+        }
+    });
 
     // Date Label
     const todayNzLabel = new Date().toLocaleDateString('en-NZ', {
@@ -395,7 +549,7 @@
     });
     document.getElementById('briefing-date-label').innerText = todayNzLabel;
 
-    // 2. Weather Strip (Icons + Time, No Map, No Animation)
+    // 2. Weather Strip
     function renderWeatherStrip() {
         const tl = (state.weatherConfig && state.weatherConfig.timeline) || [
             { hour: 0, tempC: 11, condition: "Clear", type: "clear", cloudCover: 10, windKmh: 14 },
@@ -428,7 +582,6 @@
             strip.appendChild(slot);
         });
     }
-    renderWeatherStrip();
 
     // 3. Render Day Plan Agenda
     function renderAgendaUI() {
@@ -448,7 +601,6 @@
             listEl.appendChild(row);
         });
     }
-    renderAgendaUI();
 
     // 4. Render Reorderable To-Do List
     function renderTodosUI() {
@@ -474,7 +626,7 @@
 
             div.querySelector('input').addEventListener('change', (e) => {
                 state.todos[idx].done = e.target.checked;
-                persistState();
+                queueCloudSync();
                 renderTodosUI();
             });
 
@@ -483,7 +635,7 @@
                     const temp = state.todos[idx];
                     state.todos[idx] = state.todos[idx - 1];
                     state.todos[idx - 1] = temp;
-                    persistState();
+                    queueCloudSync();
                     renderTodosUI();
                 }
             });
@@ -493,14 +645,14 @@
                     const temp = state.todos[idx];
                     state.todos[idx] = state.todos[idx + 1];
                     state.todos[idx + 1] = temp;
-                    persistState();
+                    queueCloudSync();
                     renderTodosUI();
                 }
             });
 
             div.querySelector('.delete-task').addEventListener('click', () => {
                 state.todos.splice(idx, 1);
-                persistState();
+                queueCloudSync();
                 renderTodosUI();
             });
 
@@ -508,7 +660,6 @@
         });
         document.getElementById('todoCountBadge').innerText = `${doneCount}/${state.todos.length} done`;
     }
-    renderTodosUI();
 
     function addNewTodo() {
         const input = document.getElementById('newTodoInput');
@@ -516,7 +667,7 @@
         if (!text) return;
         state.todos.push({ id: 't_' + Date.now(), text, tag: 'Today', done: false });
         input.value = '';
-        persistState();
+        queueCloudSync();
         renderTodosUI();
     }
 
@@ -535,8 +686,8 @@
         document.getElementById('spotlightWordTerm').innerText = w.term || '';
         document.getElementById('spotlightWordDef').innerText = w.definition || '';
     }
-    renderSpotlightUI();
 
+    initDashboard();
 })();
 </script>
 
