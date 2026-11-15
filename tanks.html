@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TNK_DUEL // 2P TANK BATTLE ARENA</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #202124;
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h2 {
+            color: #202124;
+            margin-bottom: 5px;
+            font-size: 28px;
+        }
+        .google-sub {
+            font-size: 14px;
+            color: #5f6368;
+            margin-bottom: 15px;
+        }
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .p1-score { color: #1a73e8; }
+        .p2-score { color: #ea4335; }
+        canvas {
+            border: 1px solid #dadce0;
+            background: #ffffff;
+            box-shadow: 0 1px 6px rgba(32,33,36,.28);
+            display: block;
+            margin: 10px auto;
+            border-radius: 8px;
+        }
+        .controls-info {
+            font-size: 13px;
+            color: #5f6368;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+        .controls-info span {
+            background: #f1f3f4;
+            padding: 4px 10px;
+            border-radius: 4px;
+            border: 1px solid #dadce0;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #1a0dab;
+            background: #f1f3f4;
+            border: 1px solid #dadce0;
+            padding: 8px 18px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .back-link:hover {
+            background: #e8f0fe;
+            border-color: #d2e3fc;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>TNK_DUEL.EXE</h2>
+    <div class="google-sub">2-Player Tank Arena &bull; Power-Ups & Bullet Bouncing</div>
+
+    <div class="scoreboard">
+        <div class="p1-score">PLAYER 1 (Blue): <span id="p1Score">0</span></div>
+        <div class="p2-score">PLAYER 2 (Red): <span id="p2Score">0</span></div>
+    </div>
+
+    <canvas id="gameCanvas" width="700" height="500"></canvas>
+
+    <div class="controls-info">
+        <span><strong>P1:</strong> WASD to Move, SHIFT to Shoot</span>
+        <span><strong>P2:</strong> ARROWS to Move, ENTER to Shoot</span>
+    </div>
+
+    <div>
+        <a class="back-link" href="index.html">&larr; Return to Dashboard</a>
+    </div>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+// Game State
+let p1Score = 0;
+let p2Score = 0;
+
+// Input tracking
+const keys = {};
+window.addEventListener("keydown", e => { keys[e.code] = true; if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.code)) e.preventDefault(); });
+window.addEventListener("keyup", e => { keys[e.code] = false; });
+
+// Walls / Obstacles
+const walls = [
+    {x: 150, y: 100, w: 40, h: 120},
+    {x: 510, y: 100, w: 40, h: 120},
+    {x: 150, y: 300, w: 40, h: 120},
+    {x: 510, y: 300, w: 40, h: 120},
+    {x: 300, y: 210, w: 100, h: 80}
+];
+
+// Tanks
+let tank1 = {
+    x: 80, y: 250, size: 24, angle: 0, speed: 2.5, rotSpeed: 0.05,
+    color: "#1a73e8", barrelLen: 22, lastShot: 0, shootCooldown: 400,
+    powerup: null, powerupTimer: 0, score: 0
+};
+
+let tank2 = {
+    x: 620, y: 250, size: 24, angle: Math.PI, speed: 2.5, rotSpeed: 0.05,
+    color: "#ea4335", barrelLen: 22, lastShot: 0, shootCooldown: 400,
+    powerup: null, powerupTimer: 0, score: 0
+};
+
+let bullets = [];
+let powerups = [];
+
+// Power-up types: 'speed', 'rapid', 'triple'
+function spawnPowerup() {
+    if (powerups.length < 2 && Math.random() < 0.01) {
+        let types = ['speed', 'rapid', 'triple'];
+        powerups.push({
+            x: Math.random() * (canvas.width - 100) + 50,
+            y: Math.random() * (canvas.height - 100) + 50,
+            radius: 12,
+            type: types[Math.floor(Math.random() * types.length)]
+        });
+    }
+}
+
+function resetRound(winner) {
+    if (winner === 1) p1Score++;
+    else if (winner === 2) p2Score++;
+    document.getElementById("p1Score").innerText = p1Score;
+    document.getElementById("p2Score").innerText = p2Score;
+
+    tank1.x = 80; tank1.y = 250; tank1.angle = 0; tank1.powerup = null;
+    tank2.x = 620; tank2.y = 250; tank2.angle = Math.PI; tank2.powerup = null;
+    bullets = [];
+    powerups = [];
+}
+
+function checkRectCollision(x, y, size, wall) {
+    return x - size/2 < wall.x + wall.w &&
+           x + size/2 > wall.x &&
+           y - size/2 < wall.y + wall.h &&
+           y + size/2 > wall.y;
+}
+
+function updateTank(tank, forwardKey, backKey, leftKey, rightKey, shootKey) {
+    // Rotation
+    if (keys[leftKey]) tank.angle -= tank.rotSpeed;
+    if (keys[rightKey]) tank.angle += tank.rotSpeed;
+
+    let currentSpeed = tank.powerup === 'speed' ? tank.speed * 1.6 : tank.speed;
+
+    // Movement
+    let dx = 0, dy = 0;
+    if (keys[forwardKey]) {
+        dx = Math.cos(tank.angle) * currentSpeed;
+        dy = Math.sin(tank.angle) * currentSpeed;
+    }
+    if (keys[backKey]) {
+        dx = -Math.cos(tank.angle) * (currentSpeed * 0.6);
+        dy = -Math.sin(tank.angle) * (currentSpeed * 0.6);
+    }
+
+    // Try X movement
+    tank.x += dx;
+    if (tank.x < tank.size/2 || tank.x > canvas.width - tank.size/2) tank.x -= dx;
+    for (let w of walls) {
+        if (checkRectCollision(tank.x, tank.y, tank.size, w)) { tank.x -= dx; break; }
+    }
+
+    // Try Y movement
+    tank.y += dy;
+    if (tank.y < tank.size/2 || tank.y > canvas.height - tank.size/2) tank.y -= dy;
+    for (let w of walls) {
+        if (checkRectCollision(tank.x, tank.y, tank.size, w)) { tank.y -= dy; break; }
+    }
+
+    // Powerup timer
+    if (tank.powerup) {
+        tank.powerupTimer--;
+        if (tank.powerupTimer <= 0) tank.powerup = null;
+    }
+
+    // Shooting
+    let now = Date.now();
+    let cooldown = tank.powerup === 'rapid' ? 150 : tank.shootCooldown;
+    if (keys[shootKey] && now - tank.lastShot > cooldown) {
+        tank.lastShot = now;
+        let bx = tank.x + Math.cos(tank.angle) * (tank.barrelLen + 10);
+        let by = tank.y + Math.sin(tank.angle) * (tank.barrelLen + 10);
+
+        if (tank.powerup === 'triple') {
+            [-0.3, 0, 0.3].forEach(offset => {
+                bullets.push({
+                    x: bx, y: by,
+                    dx: Math.cos(tank.angle + offset) * 5,
+                    dy: Math.sin(tank.angle + offset) * 5,
+                    owner: tank
+                });
+            });
+        } else {
+            bullets.push({
+                x: bx, y: by,
+                dx: Math.cos(tank.angle) * 5,
+                dy: Math.sin(tank.angle) * 5,
+                owner: tank
+            });
+        }
+    }
+}
+
+function update() {
+    updateTank(tank1, "KeyW", "KeyS", "KeyA", "KeyD", "ShiftLeft");
+    updateTank(tank2, "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Enter");
+
+    spawnPowerup();
+
+    // Check powerup collection
+    for (let i = powerups.length - 1; i >= 0; i--) {
+        let p = powerups[i];
+        if (Math.hypot(tank1.x - p.x, tank1.y - p.y) < tank1.size/2 + p.radius) {
+            tank1.powerup = p.type; tank1.powerupTimer = 400;
+            powerups.splice(i, 1);
+        } else if (Math.hypot(tank2.x - p.x, tank2.y - p.y) < tank2.size/2 + p.radius) {
+            tank2.powerup = p.type; tank2.powerupTimer = 400;
+            powerups.splice(i, 1);
+        }
+    }
+
+    // Update bullets
+    for (let i = bullets.length - 1; i >= 0; i--) {
+        let b = bullets[i];
+        b.x += b.dx;
+        b.y += b.dy;
+
+        // Wall bounce / collision
+        if (b.x < 0 || b.x > canvas.width) b.dx *= -1;
+        if (b.y < 0 || b.y > canvas.height) b.dy *= -1;
+
+        for (let w of walls) {
+            if (b.x > w.x && b.x < w.x + w.w && b.y > w.y && b.y < w.y + w.h) {
+                // Determine bounce axis simply
+                b.dx *= -1; b.dy *= -1;
+            }
+        }
+
+        // Tank hit detection
+        if (b.owner !== tank1 && Math.hypot(b.x - tank1.x, b.y - tank1.y) < tank1.size/2) {
+            resetRound(2);
+            break;
+        }
+        if (b.owner !== tank2 && Math.hypot(b.x - tank2.x, b.y - tank2.y) < tank2.size/2) {
+            resetRound(1);
+            break;
+        }
+
+        // Remove bullet if out of bounds (though bounded by canvas)
+        if (b.x < -10 || b.x > canvas.width + 10 || b.y < -10 || b.y > canvas.height + 10) {
+            bullets.splice(i, 1);
+        }
+    }
+}
+
+function drawTank(tank) {
+    ctx.save();
+    ctx.translate(tank.x, tank.y);
+    ctx.rotate(tank.angle);
+
+    // Tank body
+    ctx.fillStyle = tank.color;
+    ctx.fillRect(-tank.size/2, -tank.size/2, tank.size, tank.size);
+    ctx.strokeStyle = "#202124";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(-tank.size/2, -tank.size/2, tank.size, tank.size);
+
+    // Barrel
+    ctx.fillStyle = "#5f6368";
+    ctx.fillRect(0, -4, tank.barrelLen, 8);
+    ctx.strokeRect(0, -4, tank.barrelLen, 8);
+
+    ctx.restore();
+
+    // Powerup indicator ring
+    if (tank.powerup) {
+        ctx.strokeStyle = tank.powerup === 'speed' ? '#34a853' : (tank.powerup === 'rapid' ? '#fbbc05' : '#4285f4');
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(tank.x, tank.y, tank.size/2 + 6, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+}
+
+function draw() {
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw Grid
+    ctx.strokeStyle = "#f1f3f4";
+    ctx.lineWidth = 1;
+    for (let i = 0; i < canvas.width; i += 30) {
+        ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+    }
+    for (let j = 0; j < canvas.height; j += 30) {
+        ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(canvas.width, j); ctx.stroke();
+    }
+
+    // Draw Walls
+    for (let w of walls) {
+        ctx.fillStyle = "#bdc1c6";
+        ctx.fillRect(w.x, w.y, w.w, w.h);
+        ctx.strokeStyle = "#80868b";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(w.x, w.y, w.w, w.h);
+    }
+
+    // Draw Powerups
+    for (let p of powerups) {
+        ctx.fillStyle = p.type === 'speed' ? '#34a853' : (p.type === 'rapid' ? '#fbbc05' : '#4285f4');
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#202124";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 10px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(p.type[0].toUpperCase(), p.x, p.y);
+    }
+
+    // Draw Tanks
+    drawTank(tank1);
+    drawTank(tank2);
+
+    // Draw Bullets
+    for (let b of bullets) {
+        ctx.fillStyle = b.owner.color;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#202124";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+    }
+}
+
+function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+}
+
+loop();
+</script>
+
+</body>
+</html>
