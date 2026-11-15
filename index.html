@@ -1031,6 +1031,20 @@
 
                 <div class="poi-chips-wrap" id="poiChipsContainer"></div>
 
+                <!-- Home Location Quick Edit Card -->
+                <div style="background: #e8f0fe; border: 1.5px solid #1a73e8; border-radius: 6px; padding: 10px; margin-bottom: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span style="font-weight: bold; color: #1a73e8;">🏠 Home Location Setting</span>
+                        <button class="card-action-btn" id="pickHomeOnMapBtn">👆 Pick Home on Map</button>
+                    </div>
+                    <div class="form-grid-row" style="margin-bottom: 0;">
+                        <input type="text" id="homeNameInput" placeholder="Home label (e.g. Home - Kelburn, Home - Te Aro)" style="flex: 2;">
+                        <input type="number" step="0.0001" id="homeLatInput" placeholder="Home Lat" style="max-width: 110px;">
+                        <input type="number" step="0.0001" id="homeLngInput" placeholder="Home Lng" style="max-width: 110px;">
+                        <button class="play-btn" id="saveHomeLocBtn">Save Home Location</button>
+                    </div>
+                </div>
+
                 <!-- Add New Location Form -->
                 <div style="background: #f8f9fa; border: 1px solid #dadce0; border-radius: 6px; padding: 10px; margin-top: 6px;">
                     <div style="font-weight: bold; margin-bottom: 6px; color: #1a73e8;">➕ Add New Place of Interest</div>
@@ -1516,7 +1530,19 @@
             chip.addEventListener('click', () => {
                 map.flyTo([loc.lat, loc.lng], 15, { duration: 0.8 });
             });
-            if (loc.id !== 'home') {
+            if (loc.id === 'home') {
+                const editHomeBtn = document.createElement('button');
+                editHomeBtn.className = 'del-x-btn';
+                editHomeBtn.innerHTML = '✏️';
+                editHomeBtn.style.fontSize = '11px';
+                editHomeBtn.title = 'Edit Home Location';
+                editHomeBtn.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    document.getElementById('locationsDrawer').open = true;
+                    document.getElementById('homeNameInput').focus();
+                });
+                chip.appendChild(editHomeBtn);
+            } else {
                 const delBtn = document.createElement('button');
                 delBtn.className = 'del-x-btn';
                 delBtn.innerHTML = '&times;';
@@ -1545,6 +1571,17 @@
                 poiMarkersList.push({ marker, loc });
             }
         });
+
+        // Sync Home input fields with active Home location
+        const currHome = getLocationById('home');
+        if (currHome) {
+            const hName = document.getElementById('homeNameInput');
+            const hLat = document.getElementById('homeLatInput');
+            const hLng = document.getElementById('homeLngInput');
+            if (hName && document.activeElement !== hName) hName.value = currHome.name;
+            if (hLat && document.activeElement !== hLat) hLat.value = currHome.lat.toFixed(5);
+            if (hLng && document.activeElement !== hLng) hLng.value = currHome.lng.toFixed(5);
+        }
     }
 
     // 5. Real Street Routing & Day Plan Interpolation
@@ -1910,30 +1947,72 @@
 
     // Map Controls & Add Location Picker
     let pickingMapLocation = false;
+    let pickingHomeLocation = false;
     let followBenMode = false;
 
     function startMapPickMode() {
         pickingMapLocation = true;
+        pickingHomeLocation = false;
+        document.getElementById('mapPickBanner').innerText = '👆 Click anywhere on the Wellington map to place your new location! (Esc to cancel)';
         document.getElementById('mapPickBanner').style.display = 'block';
         document.getElementById('locationsDrawer').open = true;
         document.getElementById('wellingtonLeafletMap').style.cursor = 'crosshair';
     }
-    function stopMapPickMode() {
+    function startHomePickMode() {
+        pickingHomeLocation = true;
         pickingMapLocation = false;
+        document.getElementById('mapPickBanner').innerText = '🏠 Click on the Wellington map to set your new HOME location! (Esc to cancel)';
+        document.getElementById('mapPickBanner').style.display = 'block';
+        document.getElementById('locationsDrawer').open = true;
+        document.getElementById('wellingtonLeafletMap').style.cursor = 'crosshair';
+    }
+    function stopAllPickModes() {
+        pickingMapLocation = false;
+        pickingHomeLocation = false;
         document.getElementById('mapPickBanner').style.display = 'none';
         document.getElementById('wellingtonLeafletMap').style.cursor = '';
     }
 
     document.getElementById('quickAddLocBtn').addEventListener('click', startMapPickMode);
     document.getElementById('pickOnMapDrawerBtn').addEventListener('click', startMapPickMode);
-    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') stopMapPickMode(); });
+    document.getElementById('pickHomeOnMapBtn').addEventListener('click', startHomePickMode);
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') stopAllPickModes(); });
 
     map.on('click', (e) => {
+        if (pickingHomeLocation) {
+            document.getElementById('homeLatInput').value = e.latlng.lat.toFixed(5);
+            document.getElementById('homeLngInput').value = e.latlng.lng.toFixed(5);
+            stopAllPickModes();
+            document.getElementById('saveHomeLocBtn').click();
+            return;
+        }
         if (!pickingMapLocation) return;
         document.getElementById('newLocLatInput').value = e.latlng.lat.toFixed(5);
         document.getElementById('newLocLngInput').value = e.latlng.lng.toFixed(5);
-        stopMapPickMode();
+        stopAllPickModes();
         document.getElementById('newLocNameInput').focus();
+    });
+
+    document.getElementById('saveHomeLocBtn').addEventListener('click', () => {
+        const name = document.getElementById('homeNameInput').value.trim() || 'Home Base';
+        const lat = parseFloat(document.getElementById('homeLatInput').value);
+        const lng = parseFloat(document.getElementById('homeLngInput').value);
+        if (isNaN(lat) || isNaN(lng)) {
+            alert('Please enter valid coordinates for your Home location.');
+            return;
+        }
+        const hIdx = state.locations.findIndex(l => l.id === 'home');
+        if (hIdx === -1) {
+            state.locations.unshift({ id: 'home', name, lat, lng, icon: '🏠', color: '#1a73e8', category: 'Home', showPin: true });
+        } else {
+            state.locations[hIdx].name = name;
+            state.locations[hIdx].lat = lat;
+            state.locations[hIdx].lng = lng;
+        }
+        persistState();
+        renderLocationsAndPins();
+        rebuildRoutes();
+        map.flyTo([lat, lng], 15, { duration: 0.8 });
     });
 
     document.getElementById('addLocationSubmitBtn').addEventListener('click', () => {
