@@ -6,20 +6,18 @@
  * without touching index.html.
  */
 window.BRIEFING_DATA = {
-    version: "2026-11-16-v1",
+    version: "2026-11-15-v2",
     dateLabel: "Sunday, 15 Nov 2026 (NZDT)",
 
     // Animation settings: 24 seconds = full 24h loop (1 second per hour) by default
     animation: {
         defaultLoopSeconds: 24,
-        startHour: 6.5, // Start animation at 06:30 AM on load
+        startHour: 8.0, // Start animation at 08:00 AM on load
         mapCenter: [-41.2895, 174.7815],
         mapZoom: 13.5
     },
 
     // Weather settings:
-    // If autoFetchLive is true, pulls real 24h hourly Wellington forecast + sunrise/sunset
-    // from Open-Meteo (free, no API key) and falls back to `timeline` below if offline.
     weather: {
         autoFetchLive: true,
         summary: "Classic Wellington spring day — crisp sunny start, blustery midday Nor'wester, brief afternoon southerly shower, calm clear evening.",
@@ -38,48 +36,36 @@ window.BRIEFING_DATA = {
         ]
     },
 
-    // Places of Interest in Wellington (real OpenStreetMap lat/lng coordinates)
-    // Add new places here anytime — reference their `id` in `dayPlan` below!
+    // Places of Interest in Wellington
     locations: [
-        { id: "home",         name: "Home Base (Kelburn)",      lat: -41.2879, lng: 174.7684, icon: "🏠", color: "#1a73e8", category: "Home",        showPin: true },
-        { id: "vic_uni",      name: "Vic Uni (Kelburn Campus)", lat: -41.2899, lng: 174.7684, icon: "🎓", color: "#3949ab", category: "Study & AI",  showPin: true },
-        { id: "botanic",      name: "Botanic Garden",           lat: -41.2825, lng: 174.7669, icon: "🌿", color: "#2e7d32", category: "Outdoors",    showPin: true },
-        { id: "lambton",      name: "Lambton Quay / CBD",       lat: -41.2785, lng: 174.7787, icon: "🏢", color: "#455a64", category: "Tech & Work", showPin: true },
-        { id: "railway",      name: "Wellington Station",       lat: -41.2794, lng: 174.7800, icon: "🚆", color: "#00897b", category: "Transit",     showPin: true },
-        { id: "cuba_st",      name: "Cuba Street",              lat: -41.2925, lng: 174.7762, icon: "☕", color: "#8e24aa", category: "Cafes",       showPin: true },
-        { id: "te_papa",      name: "Te Papa Waterfront",       lat: -41.2903, lng: 174.7819, icon: "🏛️", color: "#d81b60", category: "Landmark",    showPin: true },
-        { id: "courtenay",    name: "Courtenay Place",          lat: -41.2932, lng: 174.7804, icon: "🎭", color: "#fb8c00", category: "City Life",   showPin: true },
-        { id: "oriental_bay", name: "Oriental Bay Parade",      lat: -41.2909, lng: 174.7903, icon: "🌊", color: "#0288d1", category: "Waterfront",  showPin: true },
-        { id: "mt_vic",       name: "Mt Victoria Lookout",      lat: -41.2960, lng: 174.7943, icon: "⛰️", color: "#43a047", category: "Lookout",     showPin: true },
-        { id: "airport",      name: "Wellington Airport",       lat: -41.3271, lng: 174.8080, icon: "✈️", color: "#f57c00", category: "Airport",     showPin: true }
+        { id: "home",                name: "Home Base (14 Essex Street)",    lat: -41.2995, lng: 174.7735, icon: "🏠", color: "#1a73e8", category: "Home",        showPin: true },
+        { id: "work_terrace",        name: "39 The Terrace (Work)",          lat: -41.2838, lng: 174.7758, icon: "🏢", color: "#455a64", category: "Tech & Work", showPin: true },
+        { id: "willis_presentation", name: "8 Willis Street (Presentation)", lat: -41.2848, lng: 174.7760, icon: "🎯", color: "#d81b60", category: "Events",    showPin: true },
+        { id: "vic_uni",             name: "Vic Uni (Kelburn Campus)",       lat: -41.2899, lng: 174.7684, icon: "🎓", color: "#3949ab", category: "Study & AI",  showPin: true },
+        { id: "te_papa",             name: "Te Papa Waterfront",             lat: -41.2903, lng: 174.7819, icon: "🏛️", color: "#d81b60", category: "Landmark",    showPin: true }
     ],
 
     // Ordered Day Plan & Calendar Events
-    // Ben's map marker stays at each event's location during [start..end] and smoothly
-    // travels along Wellington routes to the next location in between!
     dayPlan: [
-        { start: "00:00", end: "07:15", locationId: "home",         title: "Sleep & Rest",                          type: "rest",    showOnCalendar: false },
-        { start: "07:15", end: "08:30", locationId: "home",         title: "Morning Coffee & Dashboard Orientation",type: "personal",showOnCalendar: true },
-        { start: "09:00", end: "12:00", locationId: "vic_uni",      title: "AI & CogSci Deep Work / Research",      type: "study",   showOnCalendar: true },
-        { start: "12:20", end: "13:20", locationId: "cuba_st",      title: "Lunch & Flat White on Cuba St",         type: "social",  showOnCalendar: true },
-        { start: "13:45", end: "16:30", locationId: "lambton",      title: "Wellington AI Job Board & Code Sprint", type: "career",  showOnCalendar: true },
-        { start: "16:50", end: "17:45", locationId: "te_papa",      title: "Waterfront Walk via Te Papa",           type: "fitness", showOnCalendar: true },
-        { start: "18:05", end: "19:15", locationId: "mt_vic",       title: "Sunset Hike up Mt Victoria Lookout",    type: "fitness", showOnCalendar: true },
-        { start: "19:45", end: "24:00", locationId: "home",         title: "Dinner, Reading & Evening Wind-Down",   type: "personal",showOnCalendar: true }
+        { start: "00:00", end: "08:30", locationId: "home",                title: "Sleep & Morning Routine at 14 Essex St", type: "rest",    showOnCalendar: false },
+        { start: "08:30", end: "13:45", locationId: "work_terrace",        title: "Work at 39 The Terrace",                 type: "career",  showOnCalendar: true },
+        { start: "14:00", end: "15:00", locationId: "willis_presentation", title: "Presentation at 8 Willis Street",          type: "study",   showOnCalendar: true },
+        { start: "15:00", end: "17:00", locationId: "work_terrace",        title: "Afternoon Work at 39 The Terrace",       type: "career",  showOnCalendar: true },
+        { start: "17:00", end: "24:00", locationId: "home",                title: "Head home to 14 Essex Street & Relax",   type: "personal",showOnCalendar: true }
     ],
 
-    // Interactive To-Do List (persisted in localStorage for the day)
+    // Interactive To-Do List
     todos: [
-        { id: "t1", text: "Review morning weather & plan out top 3 priorities", tag: "Morning", done: true },
-        { id: "t2", text: "Shortlist 2 Wellington / remote AI graduate roles",  tag: "Career",  done: false },
-        { id: "t3", text: "Ship feature update to Hermes_dashboard repo",       tag: "Code",    done: false },
-        { id: "t4", text: "Read 1 paper on cognitive architectures / agents",   tag: "AI",      done: false }
+        { id: "t1", text: "Complete morning work session at 39 The Terrace (8:30 - 1:45)", tag: "Work", done: false },
+        { id: "t2", text: "Attend presentation at 8 Willis Street (2:00 - 3:00)",          tag: "Event", done: false },
+        { id: "t3", text: "Resume work at 39 The Terrace until 5:00 PM",                  tag: "Work", done: false },
+        { id: "t4", text: "Return home to 14 Essex Street",                              tag: "Home", done: false }
     ],
 
-    // Extensible Daily Spotlight: Morning Task, Fact of the Day, and Word of the Day
+    // Extensible Daily Spotlight
     dailySpotlight: {
         interestTopic: "Cognitive Science & Autonomous AI",
-        morningTask: "Write 15 lines of clean code or notes on an active project before opening social feeds.",
+        morningTask: "Execute today's schedule smoothly: 39 The Terrace work, Willis St presentation, and home to Essex St.",
         factOfTheDay: "Predictive coding theory suggests the brain isn't a passive feature detector — it continuously predicts incoming sensory signals and updates internal models only on surprise (prediction error).",
         wordOfTheDay: {
             term: "Affordance",
