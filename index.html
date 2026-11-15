@@ -135,6 +135,44 @@
             border-top: 1px solid #dadce0;
             padding-top: 15px;
         }
+        details.collapsible-menu {
+            border: 1px solid #dadce0;
+            border-radius: 6px;
+            margin-top: 15px;
+            background: #fff;
+            overflow: hidden;
+        }
+        details.collapsible-menu summary {
+            background-color: #f1f3f4;
+            color: #202124;
+            padding: 12px 16px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            user-select: none;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        details.collapsible-menu summary:hover {
+            background-color: #e8f0fe;
+            color: #1a73e8;
+        }
+        details.collapsible-menu[open] summary {
+            border-bottom: 1px solid #dadce0;
+        }
+        .menu-content {
+            padding: 0;
+        }
+        .menu-content table {
+            margin-top: 0;
+            border: none;
+        }
+        .menu-content th, .menu-content td {
+            border-left: none;
+            border-right: none;
+        }
     </style>
 </head>
 <body>
@@ -180,69 +218,76 @@
 
     <hr>
 
-    <h3>Project Directory</h3>
-    <table>
-        <tr>
-            <th>PROJECT_ID</th>
-            <th>DESCRIPTION</th>
-            <th>STATUS</th>
-            <th>ACTION</th>
-        </tr>
-        <tr>
-            <td><b>Hermes Agent</b></td>
-            <td>Autonomous AI Agent framework</td>
-            <td><span class="badge badge-active">ACTIVE</span></td>
-            <td><a href="https://github.com/NousResearch/hermes-agent" target="_blank">Access &rarr;</a></td>
-        </tr>
-        <tr>
-            <td><b>Dashboard_SYS</b></td>
-            <td>Retro personal command center</td>
-            <td><span class="badge badge-online">ONLINE</span></td>
-            <td><a href="#" onclick="alert('You are already here, user.'); return false;">Current</a></td>
-        </tr>
-        <tr>
-            <td><b>Flappy Hermes</b></td>
-            <td>Retro terminal arcade mini-game</td>
-            <td><span class="badge badge-playable">PLAYABLE</span></td>
-            <td><a href="flappy.html">Play Game &rarr;</a></td>
-        </tr>
-        <tr>
-            <td><b>Maze Generator</b></td>
-            <td>Procedural DFS maze solver & generator</td>
-            <td><span class="badge badge-playable">INTERACTIVE</span></td>
-            <td><a href="maze.html">Launch &rarr;</a></td>
-        </tr>
-        <tr>
-            <td><b>Hubble Deep Field</b></td>
-            <td>Cosmic scale & angular size visualiser</td>
-            <td><span class="badge badge-playable">SIMULATOR</span></td>
-            <td><a href="hubble.html">Explore &rarr;</a></td>
-        </tr>
-        <tr>
-            <td><b>Tank Duel (2P)</b></td>
-            <td>Tank.io style 2-player tank battle arena</td>
-            <td><span class="badge badge-playable">MULTIPLAYER</span></td>
-            <td><a href="tanks.html">Play Battle &rarr;</a></td>
-        </tr>
-        <tr>
-            <td><b>Connect Four (2P)</b></td>
-            <td>Classic 2-player strategy board game</td>
-            <td><span class="badge badge-playable">MULTIPLAYER</span></td>
-            <td><a href="connectfour.html">Play Game &rarr;</a></td>
-        </tr>
-        <tr>
-            <td><b>Wellington AI Jobs</b></td>
-            <td>Curated graduate & junior roles in AI/CS</td>
-            <td><span class="badge badge-active">OPPORTUNITIES</span></td>
-            <td><a href="jobs.html">View Board &rarr;</a></td>
-        </tr>
-        <tr>
-            <td><b>Personal Notes</b></td>
-            <td>Knowledge base & docs</td>
-            <td><span class="badge badge-active">SYNCED</span></td>
-            <td><a href="#" target="_blank">Access &rarr;</a></td>
-        </tr>
-    </table>
+    <details class="collapsible-menu" open>
+        <summary>
+            <span>📂 Project Directory & Interactive Links</span>
+            <span style="font-size: 12px; color: #5f6368; font-weight: normal;">[Click to collapse/expand]</span>
+        </summary>
+        <div class="menu-content">
+            <table>
+                <tr>
+                    <th>PROJECT_ID</th>
+                    <th>DESCRIPTION</th>
+                    <th>STATUS</th>
+                    <th>ACTION</th>
+                </tr>
+                <tr>
+                    <td><b>Hermes Agent</b></td>
+                    <td>Autonomous AI Agent framework</td>
+                    <td><span class="badge badge-active">ACTIVE</span></td>
+                    <td><a href="https://github.com/NousResearch/hermes-agent" target="_blank">Access &rarr;</a></td>
+                </tr>
+                <tr>
+                    <td><b>Dashboard_SYS</b></td>
+                    <td>Retro personal command center</td>
+                    <td><span class="badge badge-online">ONLINE</span></td>
+                    <td><a href="#" onclick="alert('You are already here, user.'); return false;">Current</a></td>
+                </tr>
+                <tr>
+                    <td><b>Flappy Hermes</b></td>
+                    <td>Retro terminal arcade mini-game</td>
+                    <td><span class="badge badge-playable">PLAYABLE</span></td>
+                    <td><a href="flappy.html">Play Game &rarr;</a></td>
+                </tr>
+                <tr>
+                    <td><b>Maze Generator</b></td>
+                    <td>Procedural DFS maze solver & generator</td>
+                    <td><span class="badge badge-playable">INTERACTIVE</span></td>
+                    <td><a href="maze.html">Launch &rarr;</a></td>
+                </tr>
+                <tr>
+                    <td><b>Hubble Deep Field</b></td>
+                    <td>Cosmic scale & angular size visualiser</td>
+                    <td><span class="badge badge-playable">SIMULATOR</span></td>
+                    <td><a href="hubble.html">Explore &rarr;</a></td>
+                </tr>
+                <tr>
+                    <td><b>Tank Duel (2P)</b></td>
+                    <td>Tank.io style 2-player tank battle arena</td>
+                    <td><span class="badge badge-playable">MULTIPLAYER</span></td>
+                    <td><a href="tanks.html">Play Battle &rarr;</a></td>
+                </tr>
+                <tr>
+                    <td><b>Connect Four (2P)</b></td>
+                    <td>Classic 2-player strategy board game</td>
+                    <td><span class="badge badge-playable">MULTIPLAYER</span></td>
+                    <td><a href="connectfour.html">Play Game &rarr;</a></td>
+                </tr>
+                <tr>
+                    <td><b>Wellington AI Jobs</b></td>
+                    <td>Curated graduate & junior roles in AI/CS</td>
+                    <td><span class="badge badge-active">OPPORTUNITIES</span></td>
+                    <td><a href="jobs.html">View Board &rarr;</a></td>
+                </tr>
+                <tr>
+                    <td><b>Personal Notes</b></td>
+                    <td>Knowledge base & docs</td>
+                    <td><span class="badge badge-active">SYNCED</span></td>
+                    <td><a href="#" target="_blank">Access &rarr;</a></td>
+                </tr>
+            </table>
+        </div>
+    </details>
 
     <div class="counter">
         VISITOR COUNT: <strong>0001337</strong> &bull; RETRO GOOGLE THEME v2.0
