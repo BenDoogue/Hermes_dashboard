@@ -2,55 +2,68 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FLAPPY_HERMES.EXE</title>
+    <title>FLAPPY_HERMES // RETRO GOOGLE STYLE</title>
     <style>
         body {
-            background-color: #000;
-            color: #00ff00;
-            font-family: "Courier New", Courier, monospace;
+            background-color: #f8f9fa;
+            color: #202124;
+            font-family: Arial, Helvetica, sans-serif;
             text-align: center;
             margin: 0;
             padding: 20px;
         }
         h2 {
-            text-shadow: 0 0 10px #00ff00;
+            color: #202124;
             margin-bottom: 5px;
+            font-size: 28px;
+        }
+        .google-sub {
+            font-size: 14px;
+            color: #5f6368;
+            margin-bottom: 15px;
         }
         canvas {
-            border: 2px solid #00ff00;
-            background: #000800;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            border: 1px solid #dadce0;
+            background: #ffffff;
+            box-shadow: 0 1px 6px rgba(32,33,36,.28);
             display: block;
             margin: 20px auto;
+            border-radius: 8px;
         }
         .instructions {
             font-size: 14px;
-            color: #ffff00;
+            color: #1a73e8;
+            font-weight: bold;
             margin-top: 10px;
         }
         .back-link {
             display: inline-block;
-            margin-top: 15px;
-            color: #00ff00;
-            border: 1px solid #00ff00;
-            padding: 5px 15px;
+            margin-top: 20px;
+            color: #1a0dab;
+            background: #f1f3f4;
+            border: 1px solid #dadce0;
+            padding: 8px 18px;
             text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 13px;
         }
         .back-link:hover {
-            background: #00ff00;
-            color: #000;
+            background: #e8f0fe;
+            border-color: #d2e3fc;
         }
     </style>
 </head>
 <body>
 
-    <h2>⚡ FLAPPY_HERMES.EXE ⚡</h2>
+    <h2>FLAPPY_HERMES.EXE</h2>
+    <div class="google-sub">Classic Retro Arcade Mini-Game &bull; Retro Google Edition</div>
     <div class="instructions">Press [SPACEBAR] or [CLICK] to Flap. Avoid the System Obstacles!</div>
 
     <canvas id="gameCanvas" width="400" height="500"></canvas>
 
     <div>
-        <a class="back-link" href="index.html">&lt;&lt; RETURN TO DASHBOARD</a>
+        <a class="back-link" href="index.html">&larr; Return to Dashboard</a>
     </div>
 
 <script>
@@ -58,7 +71,7 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 // Game variables
-let bird = { x: 50, y: 200, width: 20, height: 20, gravity: 0.6, lift: -10, velocity: 0 };
+let bird = { x: 50, y: 200, width: 22, height: 22, gravity: 0.6, lift: -10, velocity: 0 };
 let pipes = [];
 let frameCount = 0;
 let score = 0;
@@ -133,7 +146,7 @@ function update() {
 
         // Collision detection
         if (
-            bird.x < pipes[i].x + 40 &&
+            bird.x < pipes[i].x + 45 &&
             bird.x + bird.width > pipes[i].x &&
             (bird.y < pipes[i].top || bird.y + bird.height > canvas.height - pipes[i].bottom)
         ) {
@@ -141,7 +154,7 @@ function update() {
         }
 
         // Score update
-        if (!pipes[i].passed && pipes[i].x + 40 < bird.x) {
+        if (!pipes[i].passed && pipes[i].x + 45 < bird.x) {
             score++;
             if (score > highScore) highScore = score;
             pipes[i].passed = true;
@@ -157,12 +170,12 @@ function update() {
 }
 
 function draw() {
-    // Clear screen
-    ctx.fillStyle = "#000800";
+    // Clear screen (Clean white/cream retro background)
+    ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw grid lines for retro CRT feel
-    ctx.strokeStyle = "#001a00";
+    // Draw subtle grid lines (retro light gray)
+    ctx.strokeStyle = "#f1f3f4";
     ctx.lineWidth = 1;
     for (let i = 0; i < canvas.width; i += 20) {
         ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
@@ -171,54 +184,55 @@ function draw() {
         ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(canvas.width, j); ctx.stroke();
     }
 
-    // Draw pipes
-    ctx.fillStyle = "#00ff00";
-    ctx.strokeStyle = "#ffff00";
+    // Draw pipes (Google Blue #4285F4 with dark border)
+    ctx.fillStyle = "#4285F4";
+    ctx.strokeStyle = "#1a73e8";
     for (let pipe of pipes) {
-        ctx.fillRect(pipe.x, 0, 40, pipe.top);
-        ctx.strokeRect(pipe.x, 0, 40, pipe.top);
+        ctx.fillRect(pipe.x, 0, 45, pipe.top);
+        ctx.strokeRect(pipe.x, 0, 45, pipe.top);
         
-        ctx.fillRect(pipe.x, canvas.height - pipe.bottom, 40, pipe.bottom);
-        ctx.strokeRect(pipe.x, canvas.height - pipe.bottom, 40, pipe.bottom);
+        ctx.fillRect(pipe.x, canvas.height - pipe.bottom, 45, pipe.bottom);
+        ctx.strokeRect(pipe.x, canvas.height - pipe.bottom, 45, pipe.bottom);
     }
 
-    // Draw bird (retro green block with eye)
-    ctx.fillStyle = "#ffff00";
+    // Draw bird (Google Yellow #FBBC05 with red accent & dark outline)
+    ctx.fillStyle = "#FBBC05";
     ctx.fillRect(bird.x, bird.y, bird.width, bird.height);
-    ctx.strokeStyle = "#00ff00";
+    ctx.strokeStyle = "#EA4335";
+    ctx.lineWidth = 2;
     ctx.strokeRect(bird.x, bird.y, bird.width, bird.height);
     
     // Bird eye
-    ctx.fillStyle = "#000";
-    ctx.fillRect(bird.x + 12, bird.y + 4, 4, 4);
+    ctx.fillStyle = "#202124";
+    ctx.fillRect(bird.x + 13, bird.y + 5, 4, 4);
 
     // Draw Score
-    ctx.fillStyle = "#00ff00";
-    ctx.font = "20px 'Courier New'";
+    ctx.fillStyle = "#202124";
+    ctx.font = "bold 16px Arial";
     ctx.textAlign = "left";
     ctx.fillText("SCORE: " + score, 20, 35);
     ctx.fillText("HI-SCORE: " + highScore, 20, 60);
 
     // Start / Game Over screens
     if (!gameStarted && !isGameOver) {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#00ff00";
-        ctx.font = "24px 'Courier New'";
+        ctx.fillStyle = "#1a73e8";
+        ctx.font = "bold 22px Arial";
         ctx.textAlign = "center";
         ctx.fillText("PRESS SPACE TO START", canvas.width / 2, canvas.height / 2);
     }
 
     if (isGameOver) {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#ff0000";
-        ctx.font = "28px 'Courier New'";
+        ctx.fillStyle = "#EA4335";
+        ctx.font = "bold 24px Arial";
         ctx.textAlign = "center";
-        ctx.fillText("SYS_CRASH (GAME OVER)", canvas.width / 2, canvas.height / 2 - 20);
-        ctx.fillStyle = "#00ff00";
-        ctx.font = "16px 'Courier New'";
-        ctx.fillText("CLICK OR SPACE TO REBOOT", canvas.width / 2, canvas.height / 2 + 20);
+        ctx.fillText("SYSTEM CRASH (GAME OVER)", canvas.width / 2, canvas.height / 2 - 20);
+        ctx.fillStyle = "#5f6368";
+        ctx.font = "14px Arial";
+        ctx.fillText("Click or Space to Reboot", canvas.width / 2, canvas.height / 2 + 20);
     }
 }
 
