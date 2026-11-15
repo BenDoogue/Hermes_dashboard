@@ -4,814 +4,219 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>⚡ HERMES_DASHBOARD // WELLINGTON COMMAND CENTER ⚡</title>
-    <!-- Leaflet Real Map CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Patrick+Hand&family=Special+Elite&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; }
         body {
-            background-color: #f1f3f4;
-            color: #202124;
-            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f5f0e1;
+            background-image: linear-gradient(#e6dec5 1px, transparent 1px), linear-gradient(90deg, #e6dec5 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: #2c2c2c;
+            font-family: 'Patrick Hand', cursive, sans-serif;
             margin: 0;
-            padding: 18px;
+            padding: 20px;
+            font-size: 17px;
         }
         .container {
-            max-width: 1120px;
+            max-width: 900px;
             margin: 0 auto;
-            border: 1px solid #dadce0;
-            padding: 26px 28px;
-            box-shadow: 0 2px 10px rgba(32,33,36,.16);
-            background: #ffffff;
-            border-radius: 10px;
+            background: #fdfbf7;
+            border: 2.5px solid #2c2c2c;
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+            padding: 35px 40px;
+            box-shadow: 6px 8px 0px rgba(44,44,44,0.18);
+            position: relative;
         }
         .dashboard-title {
             text-align: center;
-            font-size: 30px;
+            font-family: 'Caveat', cursive, sans-serif;
+            font-size: 38px;
             font-weight: bold;
-            color: #202124;
-            letter-spacing: 0.8px;
-            margin-bottom: 14px;
+            color: #1a1a1a;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
         }
-        h1, h2, h3, h4 {
-            color: #202124;
-        }
-        hr {
-            border: 0;
-            border-top: 1px solid #dadce0;
-            margin: 24px 0;
+        .dashboard-subtitle {
+            text-align: center;
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 20px;
+            font-style: italic;
         }
         .status-bar {
-            background: #e8f0fe;
-            border: 1px solid #d2e3fc;
-            padding: 9px 15px;
-            border-radius: 6px;
+            background: #f4efe1;
+            border: 1.5px dashed #2c2c2c;
+            padding: 8px 14px;
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
             text-align: center;
-            font-size: 13px;
-            color: #1a73e8;
-            font-weight: bold;
+            font-size: 15px;
+            color: #2c2c2c;
+            margin-bottom: 25px;
+        }
+        h2, h3 {
+            font-family: 'Caveat', cursive, sans-serif;
+            font-size: 26px;
+            color: #1a1a1a;
+            border-bottom: 1.5px dashed #2c2c2c;
+            padding-bottom: 4px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        /* Sketchy Notebook Cards */
+        .sketch-card {
+            background: #fffefb;
+            border: 2px solid #2c2c2c;
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+            padding: 18px 22px;
             margin-bottom: 20px;
+            box-shadow: 3px 4px 0px rgba(44,44,44,0.12);
         }
-
-        /* =========================================================
-           PRIMARY WINDOW: WELLINGTON MORNING BRIEFING & REAL MAP
-           ========================================================= */
-        .morning-briefing {
-            border: 2px solid #1a73e8;
-            border-radius: 10px;
-            background: #ffffff;
-            margin-bottom: 26px;
-            box-shadow: 0 6px 20px rgba(26,115,232,0.14);
-            overflow: hidden;
-        }
-        .briefing-header {
-            background: linear-gradient(90deg, #1a73e8 0%, #1557b0 100%);
-            color: #fff;
-            padding: 12px 18px;
+        .card-header {
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
             justify-content: space-between;
             align-items: center;
-        }
-        .briefing-header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 16px;
+            margin-bottom: 12px;
             font-weight: bold;
+            font-size: 19px;
+            font-family: 'Caveat', cursive, sans-serif;
         }
-        .briefing-header-right {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            flex-wrap: wrap;
-        }
-        .header-pill {
-            background: rgba(255,255,255,0.18);
-            border: 1px solid rgba(255,255,255,0.3);
-            color: #fff;
-            padding: 4px 10px;
-            border-radius: 14px;
-            font-size: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background 0.15s;
-        }
-        .header-pill:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        .briefing-body {
+        /* Compact Weather Strip (Icons + Time, No map, No animation) */
+        .weather-strip-compact {
             display: grid;
-            grid-template-columns: 1.32fr 0.95fr;
-            gap: 18px;
-            padding: 18px;
-            align-items: start;
-        }
-        @media (max-width: 900px) {
-            .briefing-body {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Left Column: Celestial Horizon + Real Map + Scrubber */
-        .map-command-column {
-            display: flex;
-            flex-direction: column;
-            border: 1px solid #dadce0;
-            border-radius: 8px;
-            overflow: hidden;
-            background: #f8f9fa;
-        }
-
-        /* Sky Horizon Strip (Sun Rising & Falling Visualiser) */
-        .sky-horizon-wrap {
-            position: relative;
-            height: 70px;
-            width: 100%;
-            border-bottom: 1px solid #dadce0;
-            overflow: hidden;
-            background: #0f2027;
-        }
-        #skyHorizonCanvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-        .sky-hud-overlay {
-            position: absolute;
-            inset: 0;
-            padding: 7px 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            pointer-events: none;
-            color: #ffffff;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.75);
-            font-size: 12px;
-        }
-        .sim-clock-badge {
-            font-family: "Courier New", monospace;
-            font-size: 16px;
-            font-weight: bold;
-            background: rgba(15, 23, 42, 0.58);
-            padding: 3px 9px;
-            border-radius: 5px;
-            border: 1px solid rgba(255,255,255,0.25);
-            letter-spacing: 0.5px;
-        }
-        .sky-compass-labels {
-            position: absolute;
-            bottom: 3px;
-            left: 10px;
-            right: 10px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 10px;
-            font-weight: bold;
-            color: rgba(255,255,255,0.82);
-            text-shadow: 0 1px 2px rgba(0,0,0,0.9);
-            pointer-events: none;
-        }
-
-        /* Real Leaflet Map Viewport + Atmospheric Overlay */
-        .wellington-map-stage {
-            position: relative;
-            height: 400px;
-            width: 100%;
-            background: #cad2d3;
-            overflow: hidden;
-        }
-        #wellingtonLeafletMap {
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-        #mapWeatherCanvas {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 420;
-        }
-        .map-floating-controls {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 500;
-            display: flex;
-            flex-direction: column;
+            grid-template-columns: repeat(9, 1fr);
             gap: 6px;
-            align-items: flex-end;
+            text-align: center;
+            margin-top: 10px;
         }
-        .map-live-weather-pill {
-            background: rgba(255, 255, 255, 0.93);
-            backdrop-filter: blur(4px);
-            border: 1px solid #dadce0;
-            border-radius: 6px;
-            padding: 6px 10px;
-            font-size: 12px;
-            color: #202124;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.16);
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            font-weight: 600;
-        }
-        .map-btn-group {
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-        }
-        .map-mini-btn {
-            background: rgba(255,255,255,0.94);
-            border: 1px solid #dadce0;
-            border-radius: 5px;
-            padding: 4px 8px;
-            font-size: 11px;
-            font-weight: bold;
-            color: #3c4043;
-            cursor: pointer;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-        }
-        .map-mini-btn:hover {
-            background: #e8f0fe;
-            color: #1a73e8;
-            border-color: #1a73e8;
-        }
-        .map-mini-btn.active {
-            background: #1a73e8;
-            color: #fff;
-            border-color: #1a73e8;
-        }
-        .map-pick-banner {
-            position: absolute;
-            bottom: 12px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 520;
-            background: #1a73e8;
-            color: #fff;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.28);
-            display: none;
-        }
-
-        /* Custom Leaflet Markers */
-        .poi-pin {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            background: rgba(255,255,255,0.94);
-            border: 1.5px solid #5f6368;
+        .weather-slot {
+            background: #f7f3e8;
+            border: 1.5px solid #2c2c2c;
             border-radius: 12px;
-            padding: 2px 6px;
-            font-size: 11px;
-            font-weight: bold;
-            color: #202124;
-            white-space: nowrap;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.22);
-            transform: translate(-50%, -50%);
-            transition: box-shadow 0.2s, transform 0.2s;
-        }
-        .poi-pin.night-lit {
-            box-shadow: 0 0 10px 2px rgba(255, 213, 79, 0.75), 0 2px 5px rgba(0,0,0,0.4);
-        }
-        .ben-marker-wrap {
-            position: relative;
-            transform: translate(-50%, -50%);
-            pointer-events: auto;
-        }
-        .ben-pulse-ring {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            width: 30px;
-            height: 30px;
-            margin-left: -15px;
-            margin-top: -15px;
-            border-radius: 50%;
-            background: rgba(26, 115, 232, 0.35);
-            animation: benPulse 1.6s infinite ease-out;
-        }
-        @keyframes benPulse {
-            0% { transform: scale(0.65); opacity: 0.95; }
-            100% { transform: scale(1.9); opacity: 0; }
-        }
-        .ben-core-dot {
-            position: relative;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: #1a73e8;
-            border: 2.5px solid #ffffff;
-            color: #fff;
-            font-size: 11px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.38);
-        }
-        .ben-callout {
-            position: absolute;
-            bottom: 26px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1a73e8;
-            color: #ffffff;
-            padding: 3px 8px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: bold;
-            white-space: nowrap;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.28);
-            border: 1px solid rgba(255,255,255,0.65);
-        }
-
-        /* 24h Weather Strip + Time Scrubber + Playback Controls */
-        .timeline-control-panel {
-            padding: 10px 14px 12px 14px;
-            background: #f8f9fa;
-            border-top: 1px solid #dadce0;
-        }
-        .hourly-weather-strip {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 3px;
-            margin-bottom: 7px;
-        }
-        .hour-slot {
-            text-align: center;
-            font-size: 10px;
-            padding: 3px 2px;
-            border-radius: 4px;
-            background: #ffffff;
-            border: 1px solid #e8eaed;
-            cursor: pointer;
-            color: #3c4043;
-            transition: border-color 0.15s, background 0.15s;
-        }
-        .hour-slot:hover, .hour-slot.active-slot {
-            border-color: #1a73e8;
-            background: #e8f0fe;
-            font-weight: bold;
-        }
-        .scrubber-track-wrap {
-            position: relative;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            user-select: none;
-        }
-        .scrubber-track {
-            position: relative;
-            width: 100%;
-            height: 10px;
-            border-radius: 5px;
-            background: linear-gradient(90deg,
-                #162238 0%,
-                #162238 21%,
-                #f6ad55 25%,
-                #63b3ed 34%,
-                #4299e1 50%,
-                #63b3ed 72%,
-                #ed8936 83%,
-                #162238 90%,
-                #162238 100%
-            );
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.25);
-        }
-        .scrubber-fill {
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.32);
-            border-right: 2px solid #ffffff;
-            border-radius: 5px 0 0 5px;
-            pointer-events: none;
-        }
-        .scrubber-thumb {
-            position: absolute;
-            top: 50%;
-            width: 16px;
-            height: 16px;
-            margin-top: -8px;
-            margin-left: -8px;
-            border-radius: 50%;
-            background: #ffffff;
-            border: 3px solid #1a73e8;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.35);
-            pointer-events: none;
-        }
-        .scrubber-marker {
-            position: absolute;
-            top: -5px;
-            transform: translateX(-50%);
-            font-size: 10px;
-            pointer-events: none;
-        }
-        .scrubber-event-dot {
-            position: absolute;
-            bottom: -4px;
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: #1a73e8;
-            transform: translateX(-50%);
-            pointer-events: none;
-        }
-        .playback-controls-row {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
-            margin-top: 8px;
-            font-size: 12px;
-            color: #5f6368;
-        }
-        .play-btn {
-            background: #1a73e8;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            padding: 5px 12px;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .play-btn:hover { background: #1557b0; }
-        .speed-controls {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-        .speed-select, .custom-sec-input {
-            padding: 4px 6px;
-            border: 1px solid #dadce0;
-            border-radius: 4px;
-            font-size: 12px;
-            background: #fff;
-            color: #202124;
-        }
-        .custom-sec-input {
-            width: 52px;
-            text-align: center;
-        }
-
-        /* Right Column: Situational Cards */
-        .briefing-info-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .info-card {
-            border: 1px solid #dadce0;
-            border-radius: 8px;
-            padding: 12px 14px;
-            background: #f8f9fa;
-        }
-        .card-header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        .info-card h4 {
-            margin: 0;
-            font-size: 12px;
-            color: #1a73e8;
-            text-align: left;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .card-action-btn {
-            background: #ffffff;
-            border: 1px solid #dadce0;
-            color: #1a73e8;
-            border-radius: 4px;
-            padding: 2px 8px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .card-action-btn:hover {
-            background: #e8f0fe;
-            border-color: #1a73e8;
-        }
-
-        /* Calendar / Day Plan List */
-        .agenda-list {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            max-height: 195px;
-            overflow-y: auto;
-        }
-        .agenda-item {
-            font-size: 12px;
-            padding: 5px 8px;
-            border-radius: 5px;
-            background: #ffffff;
-            border: 1px solid #e8eaed;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            cursor: pointer;
-            transition: background 0.15s, border-color 0.15s;
-        }
-        .agenda-item:hover {
-            border-color: #aecbfa;
-            background: #f4f8fe;
-        }
-        .agenda-item.active-now {
-            border-left: 4px solid #1a73e8;
-            background: #e8f0fe;
-            border-color: #1a73e8;
-            font-weight: 600;
-        }
-        .agenda-time {
-            font-family: "Courier New", monospace;
-            font-weight: bold;
-            color: #1a73e8;
-            font-size: 11px;
-            white-space: nowrap;
-        }
-        .agenda-loc-badge {
-            font-size: 10px;
-            color: #5f6368;
-            background: #f1f3f4;
-            padding: 1px 6px;
-            border-radius: 8px;
-            white-space: nowrap;
-        }
-        .del-x-btn {
-            border: none;
-            background: transparent;
-            color: #9aa0a6;
-            cursor: pointer;
+            padding: 8px 2px;
             font-size: 13px;
-            padding: 0 3px;
-            line-height: 1;
         }
-        .del-x-btn:hover { color: #d93025; }
-
-        /* Inline Add Forms */
-        .inline-form-box {
-            display: none;
-            margin-top: 8px;
-            padding: 8px;
-            background: #ffffff;
-            border: 1px dashed #1a73e8;
-            border-radius: 6px;
+        .weather-slot .time {
+            font-size: 11px;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 2px;
+        }
+        .weather-slot .icon {
+            font-size: 20px;
+            margin: 2px 0;
+        }
+        .weather-slot .temp {
             font-size: 12px;
+            font-weight: bold;
         }
-        .inline-form-box.open { display: block; }
-        .form-grid-row {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            margin-bottom: 6px;
-        }
-        .form-grid-row input, .form-grid-row select {
-            padding: 4px 6px;
-            border: 1px solid #dadce0;
-            border-radius: 4px;
-            font-size: 12px;
-            flex: 1;
-            min-width: 70px;
-        }
-
-        /* To-Do List */
+        /* To-Do List with Reorder Buttons */
         .todo-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 6px;
-            font-size: 12.5px;
-            padding: 4px 6px;
-            border-radius: 4px;
-            background: #ffffff;
-            border: 1px solid #e8eaed;
-            margin-bottom: 4px;
-        }
-        .todo-item label {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            cursor: pointer;
-            flex: 1;
+            gap: 10px;
+            padding: 8px 12px;
+            background: #fffefb;
+            border: 1.5px solid #2c2c2c;
+            border-radius: 12px;
+            margin-bottom: 8px;
         }
         .todo-item.completed span.todo-text {
             text-decoration: line-through;
-            color: #80868b;
+            color: #888;
         }
-        .todo-tag {
-            font-size: 10px;
-            padding: 1px 6px;
-            border-radius: 8px;
-            background: #e8f0fe;
-            color: #1a73e8;
-            font-weight: bold;
-        }
-        .todo-add-row {
+        .todo-left {
             display: flex;
-            gap: 5px;
-            margin-top: 6px;
-        }
-        .todo-add-row input {
+            align-items: center;
+            gap: 10px;
             flex: 1;
-            padding: 5px 8px;
-            font-size: 12px;
-            border: 1px solid #dadce0;
-            border-radius: 4px;
         }
-
-        /* Morning Spotlight Module */
-        .spotlight-grid {
+        .todo-actions {
             display: flex;
-            flex-direction: column;
-            gap: 6px;
-            font-size: 12px;
-            line-height: 1.42;
+            align-items: center;
+            gap: 5px;
         }
-        .spotlight-entry {
-            background: #ffffff;
-            border: 1px solid #e8eaed;
-            border-radius: 5px;
-            padding: 6px 8px;
-        }
-        .spotlight-label {
-            font-weight: bold;
-            color: #137333;
-            font-size: 11px;
-            text-transform: uppercase;
-        }
-
-        /* Data Manager Footer Drawer */
-        .briefing-drawer {
-            border-top: 1px solid #dadce0;
-            background: #f8f9fa;
-        }
-        .briefing-drawer summary {
-            padding: 9px 18px;
-            font-size: 12px;
-            font-weight: bold;
-            color: #5f6368;
+        .sketch-btn {
+            background: #f4efe1;
+            border: 1.5px solid #2c2c2c;
+            border-radius: 8px;
+            padding: 3px 8px;
+            font-family: 'Patrick Hand', cursive;
+            font-size: 14px;
             cursor: pointer;
+            font-weight: bold;
+        }
+        .sketch-btn:hover {
+            background: #e8e0cc;
+        }
+        .todo-add-box {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .sketch-input {
+            flex: 1;
+            background: #fffefb;
+            border: 1.5px solid #2c2c2c;
+            border-radius: 10px;
+            padding: 6px 12px;
+            font-family: 'Patrick Hand', cursive;
+            font-size: 16px;
+            outline: none;
+        }
+        /* Agenda / Day Plan */
+        .agenda-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            user-select: none;
+            padding: 8px 12px;
+            background: #fffefb;
+            border: 1.5px solid #2c2c2c;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            font-size: 16px;
         }
-        .briefing-drawer summary:hover {
-            background: #e8f0fe;
+        .agenda-time {
+            font-weight: bold;
             color: #1a73e8;
+            font-family: 'Courier New', monospace;
         }
-        .drawer-inner {
-            padding: 12px 18px 16px 18px;
-            border-top: 1px solid #dadce0;
-            background: #ffffff;
-            font-size: 12px;
-        }
-        .poi-chips-wrap {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin: 8px 0 10px 0;
-        }
-        .poi-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            background: #f1f3f4;
-            border: 1px solid #dadce0;
-            border-radius: 14px;
-            padding: 3px 9px;
-            font-size: 11px;
-            cursor: pointer;
-        }
-        .poi-chip:hover {
-            background: #e8f0fe;
-            border-color: #1a73e8;
-        }
-
-        /* Existing Dashboard Styles */
+        /* Notebook Table for Games */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
+            margin-top: 12px;
         }
         th, td {
-            border: 1px solid #dadce0;
+            border: 1.5px solid #2c2c2c;
             padding: 10px 14px;
             text-align: left;
-            font-size: 14px;
+            font-size: 16px;
         }
         th {
-            background-color: #f1f3f4;
-            color: #5f6368;
-            font-weight: bold;
+            background-color: #f4efe1;
+            font-family: 'Caveat', cursive;
+            font-size: 20px;
         }
-        a { color: #1a0dab; text-decoration: none; }
-        a:hover { text-decoration: underline; }
+        a { color: #1a0dab; text-decoration: underline; }
         .badge {
             display: inline-block;
             padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-        .badge-active { background: #e6f4ea; color: #137333; }
-        .badge-online { background: #e8f0fe; color: #1a73e8; }
-        .badge-playable { background: #fef7e0; color: #b06000; }
-
-        .chart-container {
-            margin-top: 16px;
-            border: 1px solid #dadce0;
-            padding: 18px 20px;
-            background: #fff;
-            border-radius: 6px;
-        }
-        .bar-row {
-            display: flex;
-            align-items: center;
-            margin: 10px 0;
-        }
-        .bar-label {
-            width: 130px;
+            border: 1px solid #2c2c2c;
+            border-radius: 8px;
             font-size: 13px;
-            color: #5f6368;
-        }
-        .bar-track {
-            flex-grow: 1;
-            background: #f1f3f4;
-            border-radius: 4px;
-            height: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-        .bar-fill { height: 100%; border-radius: 4px; width: 0%; }
-        .fill-blue { background: #4285F4; }
-        .fill-green { background: #34A853; }
-        .fill-yellow { background: #FBBC05; }
-        .bar-value {
-            position: absolute;
-            right: 8px;
-            top: 0;
-            font-size: 11px;
-            color: #202124;
             font-weight: bold;
-            line-height: 20px;
+            background: #e6f4ea;
         }
-        details.collapsible-menu {
-            border: 1px solid #dadce0;
-            border-radius: 6px;
-            margin-top: 15px;
-            background: #fff;
-            overflow: hidden;
-        }
-        details.collapsible-menu summary {
-            background-color: #f1f3f4;
-            color: #202124;
-            padding: 12px 16px;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            user-select: none;
-            outline: none;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        details.collapsible-menu summary:hover {
-            background: #e8f0fe;
-            color: #1a73e8;
-        }
-        details.collapsible-menu[open] summary {
-            border-bottom: 1px solid #dadce0;
-        }
-        .menu-content { padding: 0; }
-        .menu-content table { margin-top: 0; border: none; }
-        .menu-content th, .menu-content td { border-left: none; border-right: none; }
-        .counter {
+        .footer-note {
             text-align: center;
-            margin-top: 28px;
-            font-size: 13px;
-            color: #5f6368;
-            border-top: 1px solid #dadce0;
+            margin-top: 30px;
+            font-size: 15px;
+            color: #666;
+            border-top: 1.5px dashed #2c2c2c;
             padding-top: 15px;
+            font-family: 'Caveat', cursive;
+            font-size: 20px;
         }
     </style>
 </head>
@@ -819,383 +224,120 @@
 
 <div class="container">
     <div class="dashboard-title">
-        HERMES_DASHBOARD <span style="font-size: 18px; color: #5f6368; font-weight: normal;">// Wellington Command Center</span>
+        ⚡ HERMES_DASHBOARD // WELLINGTON COMMAND CENTER ⚡
     </div>
+    <div class="dashboard-subtitle">~ Paper Sketch & Notebook Edition ~</div>
 
     <div class="status-bar">
         SYSTEM STATUS: ONLINE &bull; WELLINGTON LOCAL TIME: <span id="timestamp">LOADING...</span>
     </div>
 
-    <!-- =========================================================
-         PRIMARY MORNING BRIEFING & REAL WELLINGTON MAP WINDOW
-         ========================================================= -->
-    <div class="morning-briefing">
-        <div class="briefing-header">
-            <div class="briefing-header-left">
-                <span>🌅 Wellington Daily Orientation & Live Map</span>
-            </div>
-            <div class="briefing-header-right">
-                <button id="weatherSourceBtn" class="header-pill" title="Toggle between live Open-Meteo Wellington forecast and briefing-data.js forecast">🌦️ Weather: Loading...</button>
-                <span id="briefing-date-label" style="opacity: 0.95;">Loading date...</span>
-            </div>
+    <!-- DAILY WEATHER STRIP (Icons + Time, No map, No animation) -->
+    <div class="sketch-card">
+        <div class="card-header">
+            <span>⛅ Wellington Weather Forecast (Today)</span>
+            <span id="weatherSummaryLabel" style="font-size: 15px; font-weight: normal; color: #555;">11°C – 18°C &bull; Crisp & Blustery</span>
         </div>
-
-        <div class="briefing-body">
-            <!-- LEFT: SKY HORIZON + REAL TOP-DOWN WELLINGTON MAP + 24S LOOP SCRUBBER -->
-            <div class="map-command-column">
-                <!-- Celestial Horizon: Sun Rising & Falling across Wellington -->
-                <div class="sky-horizon-wrap">
-                    <canvas id="skyHorizonCanvas"></canvas>
-                    <div class="sky-hud-overlay">
-                        <div>
-                            <span id="simClockReadout" class="sim-clock-badge">06:30</span>
-                            <span id="dayPhaseReadout" style="margin-left: 8px; font-weight: bold;">🌅 Dawn</span>
-                        </div>
-                        <div id="benStatusTopBadge" style="background: rgba(15,23,42,0.55); padding: 3px 9px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.22);">
-                            📍 Home Base
-                        </div>
-                    </div>
-                    <div class="sky-compass-labels">
-                        <span>E (Remutaka / Sunrise)</span>
-                        <span>N (Solar Noon)</span>
-                        <span>W (Makara / Sunset)</span>
-                    </div>
-                </div>
-
-                <!-- Real OpenStreetMap / CartoDB Map of Wellington + Weather Particle Canvas -->
-                <div class="wellington-map-stage">
-                    <div id="wellingtonLeafletMap"></div>
-                    <canvas id="mapWeatherCanvas"></canvas>
-
-                    <div class="map-floating-controls">
-                        <div class="map-live-weather-pill" id="mapLiveWeatherPill">
-                            <span id="hudWeatherIcon" style="font-size: 16px;">⛅</span>
-                            <span id="hudWeatherText">15°C &bull; 24 km/h NW</span>
-                        </div>
-                        <div class="map-btn-group">
-                            <button class="map-mini-btn" id="recenterCityBtn" title="Center on Wellington City & Harbour">🎯 City View</button>
-                            <button class="map-mini-btn" id="fitAllPoiBtn" title="Zoom to include Airport & all POIs">🗺️ All POIs</button>
-                            <button class="map-mini-btn" id="followBenBtn" title="Camera follows Ben's marker">🚶 Follow Me</button>
-                            <button class="map-mini-btn" id="quickAddLocBtn" title="Add a new Place of Interest on the map">📍 + Location</button>
-                        </div>
-                    </div>
-
-                    <div class="map-pick-banner" id="mapPickBanner">
-                        👆 Click anywhere on the Wellington map to place your new location! (Esc to cancel)
-                    </div>
-                </div>
-
-                <!-- 24-Hour Weather Checkpoints + Interactive Time Progress Scrubber -->
-                <div class="timeline-control-panel">
-                    <div class="hourly-weather-strip" id="hourlyWeatherStrip">
-                        <!-- 8x 3-hour weather slots populated by JS -->
-                    </div>
-
-                    <div class="scrubber-track-wrap" id="scrubberTrackWrap" title="Click or drag to scrub through the 24-hour day">
-                        <div class="scrubber-track" id="scrubberTrack">
-                            <div class="scrubber-fill" id="scrubberFill" style="width: 27%;"></div>
-                            <div class="scrubber-marker" id="sunriseMarker" style="left: 24%;">🌅</div>
-                            <div class="scrubber-marker" id="sunsetMarker" style="left: 84%;">🌇</div>
-                            <div id="scrubberEventDots"></div>
-                            <div class="scrubber-thumb" id="scrubberThumb" style="left: 27%;"></div>
-                        </div>
-                    </div>
-
-                    <div class="playback-controls-row">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <button class="play-btn" id="playPauseBtn">⏸ Pause</button>
-                            <span id="progressPercentReadout" style="font-family: 'Courier New', monospace; font-weight: bold; color: #202124;">Day 27%</span>
-                        </div>
-
-                        <div class="speed-controls">
-                            <label for="speedPresetSelect" style="font-weight: bold;">Speed:</label>
-                            <select id="speedPresetSelect" class="speed-select">
-                                <option value="48">0.5x (48s loop • 2s/hr)</option>
-                                <option value="24" selected>1x (24s loop • 1s/hr)</option>
-                                <option value="12">2x (12s loop • 0.5s/hr)</option>
-                                <option value="6">4x (6s loop • 0.25s/hr)</option>
-                                <option value="realtime">Live NZST Clock</option>
-                                <option value="custom">Custom loop (sec)</option>
-                            </select>
-                            <span id="customLoopWrap" style="display: none; align-items: center; gap: 4px;">
-                                <input type="number" id="customLoopSecondsInput" class="custom-sec-input" min="3" max="600" value="24" title="Seconds per 24-hour cycle">s
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- RIGHT: DAILY WEATHER SUMMARY, CALENDAR/DAY PLAN, TO-DOS & MORNING SPOTLIGHT -->
-            <div class="briefing-info-panel">
-                <!-- 1. Daily Weather Overview -->
-                <div class="info-card">
-                    <div class="card-header-row">
-                        <h4>⛅ Wellington Forecast</h4>
-                        <span id="sunTimesBadge" style="font-size: 11px; color: #5f6368;">🌅 05:45 &bull; 🌇 20:15</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
-                        <div style="font-size: 12.5px; color: #202124; line-height: 1.45;">
-                            <div><strong id="dailyHiLoTemp" style="font-size: 15px;">11°C – 18°C</strong> &bull; <span id="dailyMaxWind" style="color: #1a73e8; font-weight: bold;">Peak Wind: 48 km/h</span></div>
-                            <div id="dailyWeatherSummaryText" style="color: #5f6368; font-size: 12px; margin-top: 2px;"></div>
-                        </div>
-                        <div id="currentBigWeatherEmoji" style="font-size: 30px;">⛅</div>
-                    </div>
-                </div>
-
-                <!-- 2. Calendar Events & Day Plan (Synced with Ben's Map Route!) -->
-                <div class="info-card">
-                    <div class="card-header-row">
-                        <h4>📅 Day Plan & Route Schedule</h4>
-                        <button class="card-action-btn" id="toggleAddPlanBtn">+ Add Event</button>
-                    </div>
-                    <div class="agenda-list" id="agendaListContainer"></div>
-
-                    <!-- Inline Add Event / Plan Form -->
-                    <div class="inline-form-box" id="addPlanFormBox">
-                        <div class="form-grid-row">
-                            <input type="time" id="planStartInput" value="10:30" required title="Start time">
-                            <input type="time" id="planEndInput" value="11:30" required title="End time">
-                            <select id="planLocationSelect" title="Wellington Location"></select>
-                        </div>
-                        <div class="form-grid-row" style="margin-bottom: 0;">
-                            <input type="text" id="planTitleInput" placeholder="Event / activity title (e.g. Coffee catchup)">
-                            <button class="play-btn" id="savePlanBtn" style="padding: 4px 10px;">Add</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3. Interactive To-Do List -->
-                <div class="info-card">
-                    <div class="card-header-row">
-                        <h4>✅ Today's To-Do List</h4>
-                        <span id="todoCountBadge" style="font-size: 11px; color: #5f6368;">0/0 done</span>
-                    </div>
-                    <div id="todoListContainer"></div>
-                    <div class="todo-add-row">
-                        <input type="text" id="newTodoInput" placeholder="Add a task and press Enter...">
-                        <button class="card-action-btn" id="addTodoBtn">+ Add</button>
-                    </div>
-                </div>
-
-                <!-- 4. Extensible Morning Spotlight: Task, Fact & Word of the Day -->
-                <div class="info-card">
-                    <div class="card-header-row">
-                        <h4>💡 Daily Focus: <span id="spotlightTopicLabel" style="color: #202124; text-transform: none;">AI & CogSci</span></h4>
-                        <button class="card-action-btn" id="toggleEditSpotlightBtn">✏️ Edit</button>
-                    </div>
-                    <div class="spotlight-grid" id="spotlightDisplayGrid">
-                        <div class="spotlight-entry">
-                            <span class="spotlight-label">🎯 Morning Task:</span>
-                            <span id="spotlightMorningTask"></span>
-                        </div>
-                        <div class="spotlight-entry">
-                            <span class="spotlight-label" style="color: #1a73e8;">🧠 Fact of the Day:</span>
-                            <span id="spotlightFact"></span>
-                        </div>
-                        <div class="spotlight-entry">
-                            <span class="spotlight-label" style="color: #8e24aa;">📖 Word of the Day:</span>
-                            <strong id="spotlightWordTerm"></strong> <em id="spotlightWordPron" style="color:#5f6368;"></em> —
-                            <span id="spotlightWordDef"></span>
-                        </div>
-                    </div>
-
-                    <div class="inline-form-box" id="editSpotlightFormBox">
-                        <div class="form-grid-row"><input type="text" id="editTopicInput" placeholder="Current Interest Topic"></div>
-                        <div class="form-grid-row"><input type="text" id="editMorningTaskInput" placeholder="Morning Task"></div>
-                        <div class="form-grid-row"><input type="text" id="editFactInput" placeholder="Fact of the Day"></div>
-                        <div class="form-grid-row">
-                            <input type="text" id="editWordTermInput" placeholder="Word">
-                            <input type="text" id="editWordDefInput" placeholder="Definition">
-                            <button class="play-btn" id="saveSpotlightBtn" style="padding: 4px 10px;">Save</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- EASY ADD LOCATIONS & EXPORT CONFIG DRAWER -->
-        <details class="briefing-drawer" id="locationsDrawer">
-            <summary>
-                <span>📍 Manage Wellington Locations & Easy Daily Update Config (`briefing-data.js`)</span>
-                <span style="font-weight: normal; font-size: 11px;">[Click to expand / add locations / export]</span>
-            </summary>
-            <div class="drawer-inner">
-                <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
-                    <strong>Saved Wellington Places of Interest (click any chip to fly there):</strong>
-                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                        <button class="card-action-btn" id="pickOnMapDrawerBtn">👆 Pick Location on Map</button>
-                        <button class="card-action-btn" id="copyConfigBtn">📋 Copy briefing-data.js</button>
-                        <button class="card-action-btn" id="resetConfigBtn" style="color: #d93025;">↺ Reset to briefing-data.js</button>
-                    </div>
-                </div>
-
-                <div class="poi-chips-wrap" id="poiChipsContainer"></div>
-
-                <!-- Home Location Quick Edit Card -->
-                <div style="background: #e8f0fe; border: 1.5px solid #1a73e8; border-radius: 6px; padding: 10px; margin-bottom: 10px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <span style="font-weight: bold; color: #1a73e8;">🏠 Home Location Setting</span>
-                        <button class="card-action-btn" id="pickHomeOnMapBtn">👆 Pick Home on Map</button>
-                    </div>
-                    <div class="form-grid-row" style="margin-bottom: 0;">
-                        <input type="text" id="homeNameInput" placeholder="Home label (e.g. Home - Kelburn, Home - Te Aro)" style="flex: 2;">
-                        <input type="number" step="0.0001" id="homeLatInput" placeholder="Home Lat" style="max-width: 110px;">
-                        <input type="number" step="0.0001" id="homeLngInput" placeholder="Home Lng" style="max-width: 110px;">
-                        <button class="play-btn" id="saveHomeLocBtn">Save Home Location</button>
-                    </div>
-                </div>
-
-                <!-- Add New Location Form -->
-                <div style="background: #f8f9fa; border: 1px solid #dadce0; border-radius: 6px; padding: 10px; margin-top: 6px;">
-                    <div style="font-weight: bold; margin-bottom: 6px; color: #1a73e8;">➕ Add New Place of Interest</div>
-                    <div class="form-grid-row" style="margin-bottom: 0;">
-                        <input type="text" id="newLocIconInput" value="📌" style="max-width: 48px; text-align: center;" title="Emoji Icon">
-                        <input type="text" id="newLocNameInput" placeholder="Place name (e.g. Raglan Roast, Freyberg Pool)" style="flex: 2;">
-                        <input type="text" id="newLocCategoryInput" placeholder="Category (e.g. Cafe, Gym)" style="flex: 1;">
-                        <input type="number" step="0.0001" id="newLocLatInput" placeholder="Lat (-41.290)" style="max-width: 105px;">
-                        <input type="number" step="0.0001" id="newLocLngInput" placeholder="Lng (174.776)" style="max-width: 105px;">
-                        <button class="play-btn" id="addLocationSubmitBtn">Save Location</button>
-                    </div>
-                    <div style="font-size: 11px; color: #5f6368; margin-top: 6px;">
-                        💡 <em>Tip:</em> Daily updates live in <code>briefing-data.js</code> (~80 lines) — ask Hermes each morning to update your plan/todos/spotlight for negligible token cost, or edit right here and click <strong>Copy briefing-data.js</strong>!
-                    </div>
-                </div>
-            </div>
-        </details>
-    </div>
-
-    <h3>System Metrics & Performance</h3>
-
-    <div class="chart-container">
-        <h4 style="text-align: center; margin-top: 0;">Daily Performance Barometer</h4>
-        
-        <div class="bar-row">
-            <div class="bar-label">Token Usage</div>
-            <div class="bar-track">
-                <div class="bar-fill fill-blue" style="width: 45%;"></div>
-                <span class="bar-value">45%</span>
-            </div>
-        </div>
-
-        <div class="bar-row">
-            <div class="bar-label">Task Velocity</div>
-            <div class="bar-track">
-                <div class="bar-fill fill-green" style="width: 80%;"></div>
-                <span class="bar-value">80%</span>
-            </div>
-        </div>
-
-        <div class="bar-row">
-            <div class="bar-label">System Health</div>
-            <div class="bar-track">
-                <div class="bar-fill fill-yellow" style="width: 99%;"></div>
-                <span class="bar-value">99%</span>
-            </div>
+        <div class="weather-strip-compact" id="compactWeatherStrip">
+            <!-- Populated by JS -->
         </div>
     </div>
 
-    <hr>
-
-    <details class="collapsible-menu" open>
-        <summary>
-            <span>🎮 Interactive Games & Apps</span>
-            <span style="font-size: 12px; color: #5f6368; font-weight: normal;">[Click to collapse/expand]</span>
-        </summary>
-        <div class="menu-content">
-            <table>
-                <tr>
-                    <th>PROJECT_ID</th>
-                    <th>DESCRIPTION</th>
-                    <th>STATUS</th>
-                    <th>ACTION</th>
-                </tr>
-                <tr>
-                    <td><b>Flappy Hermes</b></td>
-                    <td>Retro terminal arcade mini-game</td>
-                    <td><span class="badge badge-playable">PLAYABLE</span></td>
-                    <td><a href="flappy.html">Play Game &rarr;</a></td>
-                </tr>
-                <tr>
-                    <td><b>Maze Generator</b></td>
-                    <td>Procedural DFS maze solver & generator</td>
-                    <td><span class="badge badge-playable">INTERACTIVE</span></td>
-                    <td><a href="maze.html">Launch &rarr;</a></td>
-                </tr>
-                <tr>
-                    <td><b>Hubble Deep Field</b></td>
-                    <td>Cosmic scale & angular size visualiser</td>
-                    <td><span class="badge badge-playable">SIMULATOR</span></td>
-                    <td><a href="hubble.html">Explore &rarr;</a></td>
-                </tr>
-                <tr>
-                    <td><b>Tank Duel (2P)</b></td>
-                    <td>Tank.io style 2-player tank battle arena</td>
-                    <td><span class="badge badge-playable">MULTIPLAYER</span></td>
-                    <td><a href="tanks.html">Play Battle &rarr;</a></td>
-                </tr>
-                <tr>
-                    <td><b>Connect Four (2P)</b></td>
-                    <td>Classic 2-player strategy board game</td>
-                    <td><span class="badge badge-playable">MULTIPLAYER</span></td>
-                    <td><a href="connectfour.html">Play Game &rarr;</a></td>
-                </tr>
-                <tr>
-                    <td><b>Wellington AI Jobs</b></td>
-                    <td>Curated graduate & junior roles in AI/CS</td>
-                    <td><span class="badge badge-active">OPPORTUNITIES</span></td>
-                    <td><a href="jobs.html">View Board &rarr;</a></td>
-                </tr>
-            </table>
+    <!-- DAY PLAN & SCHEDULE -->
+    <div class="sketch-card">
+        <div class="card-header">
+            <span>📅 Today's Schedule & Plan</span>
+            <span style="font-size: 15px; font-weight: normal; color: #555;" id="briefing-date-label">Sunday, 15 Nov 2026</span>
         </div>
-    </details>
-
-    <details class="collapsible-menu" open style="margin-top: 15px;">
-        <summary>
-            <span>⚙️ Hermes, Dashboard & Personal Notes</span>
-            <span style="font-size: 12px; color: #5f6368; font-weight: normal;">[Click to collapse/expand]</span>
-        </summary>
-        <div class="menu-content">
-            <table>
-                <tr>
-                    <th>PROJECT_ID</th>
-                    <th>DESCRIPTION</th>
-                    <th>STATUS</th>
-                    <th>ACTION</th>
-                </tr>
-                <tr>
-                    <td><b>Hermes Agent</b></td>
-                    <td>Autonomous AI Agent framework</td>
-                    <td><span class="badge badge-active">ACTIVE</span></td>
-                    <td><a href="https://github.com/NousResearch/hermes-agent" target="_blank">Access &rarr;</a></td>
-                </tr>
-                <tr>
-                    <td><b>Dashboard_SYS</b></td>
-                    <td>Retro personal command center</td>
-                    <td><span class="badge badge-online">ONLINE</span></td>
-                    <td><a href="#" onclick="alert('You are already here, Ben.'); return false;">Current</a></td>
-                </tr>
-                <tr>
-                    <td><b>Personal Notes</b></td>
-                    <td>Knowledge base & docs</td>
-                    <td><span class="badge badge-active">SYNCED</span></td>
-                    <td><a href="#" target="_blank">Access &rarr;</a></td>
-                </tr>
-            </table>
+        <div id="agendaListContainer">
+            <!-- Populated by JS -->
         </div>
-    </details>
+    </div>
 
-    <div class="counter">
-        VISITOR COUNT: <strong>0001337</strong> &bull; RETRO GOOGLE THEME v3.0
+    <!-- TO-DO LIST WITH REORDER BUTTONS -->
+    <div class="sketch-card">
+        <div class="card-header">
+            <span>✅ Interactive To-Do List (Reorderable)</span>
+            <span id="todoCountBadge" style="font-size: 15px; font-weight: normal; color: #555;">0/0 done</span>
+        </div>
+        <div id="todoListContainer">
+            <!-- Populated by JS -->
+        </div>
+        <div class="todo-add-box">
+            <input type="text" id="newTodoInput" class="sketch-input" placeholder="Add a new task and press Enter...">
+            <button class="sketch-btn" id="addTodoBtn">+ Add Task</button>
+        </div>
+    </div>
+
+    <!-- DAILY SPOTLIGHT -->
+    <div class="sketch-card">
+        <div class="card-header">
+            <span>💡 Daily Focus & Spotlight</span>
+            <span style="font-size: 15px; font-weight: normal; color: #555;" id="spotlightTopicLabel">Cognitive Science & AI</span>
+        </div>
+        <div style="font-size: 17px; line-height: 1.5; display: flex; flex-direction: column; gap: 8px;">
+            <div><strong>🎯 Morning Task:</strong> <span id="spotlightMorningTask">Execute today's schedule smoothly: 39 The Terrace work, Willis St presentation, and home to Essex St.</span></div>
+            <div><strong>🧠 Fact of the Day:</strong> <span id="spotlightFact">Predictive coding theory suggests the brain isn't a passive feature detector — it continuously predicts incoming sensory signals and updates internal models only on surprise (prediction error).</span></div>
+            <div><strong>📖 Word of the Day:</strong> <strong id="spotlightWordTerm">Affordance</strong> — <span id="spotlightWordDef">In cognitive science & design, an action possibility directly offered by the environment to an agent.</span></div>
+        </div>
+    </div>
+
+    <!-- GAMES & APPS -->
+    <h3>🎮 Interactive Games & Tools</h3>
+    <table>
+        <tr>
+            <th>PROJECT_ID</th>
+            <th>DESCRIPTION</th>
+            <th>STATUS</th>
+            <th>ACTION</th>
+        </tr>
+        <tr>
+            <td><b>Flappy Hermes</b></td>
+            <td>Retro terminal arcade mini-game</td>
+            <td><span class="badge">PLAYABLE</span></td>
+            <td><a href="flappy.html">Play Game &rarr;</a></td>
+        </tr>
+        <tr>
+            <td><b>Maze Generator</b></td>
+            <td>Procedural DFS maze solver & generator</td>
+            <td><span class="badge">INTERACTIVE</span></td>
+            <td><a href="maze.html">Launch &rarr;</a></td>
+        </tr>
+        <tr>
+            <td><b>Hubble Deep Field</b></td>
+            <td>Cosmic scale & angular size visualiser</td>
+            <td><span class="badge">SIMULATOR</span></td>
+            <td><a href="hubble.html">Explore &rarr;</a></td>
+        </tr>
+        <tr>
+            <td><b>Tank Duel (2P)</b></td>
+            <td>Tank.io style 2-player tank battle arena</td>
+            <td><span class="badge">MULTIPLAYER</span></td>
+            <td><a href="tanks.html">Play Battle &rarr;</a></td>
+        </tr>
+        <tr>
+            <td><b>Connect Four (2P)</b></td>
+            <td>Classic 2-player strategy board game</td>
+            <td><span class="badge">MULTIPLAYER</span></td>
+            <td><a href="connectfour.html">Play Game &rarr;</a></td>
+        </tr>
+        <tr>
+            <td><b>Wellington AI Jobs</b></td>
+            <td>Curated graduate & junior roles in AI/CS</td>
+            <td><span class="badge">OPPORTUNITIES</span></td>
+            <td><a href="jobs.html">View Board &rarr;</a></td>
+        </tr>
+    </table>
+
+    <div class="footer-note">
+        VISITOR COUNT: <strong>0001337</strong> &bull; NOTEBOOK SKETCH EDITION
     </div>
 </div>
 
-<!-- External Libraries & Lightweight Daily Config -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script src="briefing-data.js"></script>
-
 <script>
 (() => {
-    // 1. Live NZST System Status Clock
+    // 1. System Clock
     function updateSystemTimestamp() {
         const now = new Date();
         document.getElementById('timestamp').innerText = now.toLocaleString('en-NZ', {
@@ -1213,15 +355,13 @@
     updateSystemTimestamp();
     setInterval(updateSystemTimestamp, 1000);
 
-    // 2. Load & Version-Sync Daily Briefing State
     const fileData = window.BRIEFING_DATA || {};
-    const STORAGE_KEY = 'hermes_briefing_state_v3';
+    const STORAGE_KEY = 'hermes_notebook_state_v1';
     let state = null;
 
     function buildFreshState() {
         return {
             version: fileData.version || 'v1',
-            locations: JSON.parse(JSON.stringify(fileData.locations || [])),
             dayPlan: JSON.parse(JSON.stringify(fileData.dayPlan || [])),
             todos: JSON.parse(JSON.stringify(fileData.todos || [])),
             dailySpotlight: JSON.parse(JSON.stringify(fileData.dailySpotlight || {})),
@@ -1235,13 +375,6 @@
             state = saved;
         } else {
             state = buildFreshState();
-            // Carry over any user-added custom locations across daily version bumps
-            if (saved && Array.isArray(saved.locations)) {
-                const existingIds = new Set(state.locations.map(l => l.id));
-                saved.locations.forEach(loc => {
-                    if (!existingIds.has(loc.id)) state.locations.push(loc);
-                });
-            }
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         }
     } catch (e) {
@@ -1252,7 +385,7 @@
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
     }
 
-    // Set Date Header (auto-format today in Wellington if desired)
+    // Date Label
     const todayNzLabel = new Date().toLocaleDateString('en-NZ', {
         timeZone: 'Pacific/Auckland',
         weekday: 'long',
@@ -1262,647 +395,120 @@
     });
     document.getElementById('briefing-date-label').innerText = todayNzLabel;
 
-    // 3. Weather Data Engine (Supports both Live Open-Meteo Wellington & Config Timeline)
-    let liveWeatherTimeline = null;
-    let liveSunTimes = null;
-    let useLiveWeather = !!(state.weatherConfig && state.weatherConfig.autoFetchLive);
-
-    function degToCompass(deg) {
-        const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
-        return dirs[Math.round(((deg % 360) + 360) % 360 / 22.5) % 16];
-    }
-
-    function wmoToType(code, windKmh) {
-        if (code >= 51 && code <= 67) return { type: 'rain', condition: 'Rain / Drizzle' };
-        if (code >= 80 && code <= 82) return { type: 'rain', condition: 'Passing Showers' };
-        if (code >= 95) return { type: 'rain', condition: 'Squally Storm' };
-        if (code === 3) return { type: windKmh > 35 ? 'windy' : 'overcast', condition: windKmh > 35 ? 'Overcast & Gusty' : 'Overcast' };
-        if (code === 1 || code === 2) return { type: windKmh > 36 ? 'windy' : 'partly_cloudy', condition: windKmh > 36 ? 'Windy & Partly Cloudy' : 'Partly Cloudy' };
-        return { type: windKmh > 38 ? 'windy' : 'clear', condition: windKmh > 38 ? 'Clear & Blustery' : 'Clear Sky' };
-    }
-
-    function weatherEmojiFor(w, isNight) {
-        if (w.type === 'rain' || w.precipMm > 0.25) return w.cloudCover < 65 && !isNight ? '🌦️' : '🌧️';
-        if (w.windKmh >= 40 && w.cloudCover < 75) return '💨';
-        if (w.cloudCover >= 78) return '☁️';
-        if (w.cloudCover >= 32) return isNight ? '☁️' : '⛅';
-        return isNight ? '🌙' : '☀️';
-    }
-
-    function activeTimeline() {
-        if (useLiveWeather && liveWeatherTimeline && liveWeatherTimeline.length) {
-            return liveWeatherTimeline;
-        }
-        return state.weatherConfig.timeline || [
-            { hour: 0, tempC: 13, condition: 'Clear', type: 'clear', cloudCover: 20, windKmh: 20, windDirDeg: 320, windLabel: 'NW', precipMm: 0 }
+    // 2. Weather Strip (Icons + Time, No Map, No Animation)
+    function renderWeatherStrip() {
+        const tl = (state.weatherConfig && state.weatherConfig.timeline) || [
+            { hour: 0, tempC: 11, condition: "Clear", type: "clear", cloudCover: 10, windKmh: 14 },
+            { hour: 3, tempC: 11, condition: "Clear", type: "clear", cloudCover: 12, windKmh: 15 },
+            { hour: 6, tempC: 12, condition: "Crisp", type: "clear", cloudCover: 15, windKmh: 18 },
+            { hour: 9, tempC: 15, condition: "Partly Cloudy", type: "partly_cloudy", cloudCover: 35, windKmh: 28 },
+            { hour: 12, tempC: 18, condition: "Windy", type: "windy", cloudCover: 55, windKmh: 44 },
+            { hour: 15, tempC: 14, condition: "Showers", type: "rain", cloudCover: 85, windKmh: 48 },
+            { hour: 18, tempC: 15, condition: "Clearing", type: "partly_cloudy", cloudCover: 40, windKmh: 25 },
+            { hour: 21, tempC: 12, condition: "Calm Dusk", type: "clear", cloudCover: 15, windKmh: 14 },
+            { hour: 23, tempC: 11, condition: "Starry Night", type: "clear", cloudCover: 10, windKmh: 12 }
         ];
-    }
-
-    function getSunriseSunset() {
-        if (useLiveWeather && liveSunTimes) return liveSunTimes;
-        return {
-            sunrise: state.weatherConfig.sunriseHour || 5.8,
-            sunset: state.weatherConfig.sunsetHour || 20.2
-        };
-    }
-
-    // Smoothly interpolate weather at any fractional hour [0..24)
-    function getWeatherAtHour(h) {
-        const tl = activeTimeline().slice().sort((a, b) => a.hour - b.hour);
-        if (tl.length === 1) return tl[0];
-        // Wrap around midnight smoothly
-        let prev = tl[tl.length - 1];
-        let next = tl[0];
-        let span = (24 - prev.hour) + next.hour;
-        let offset = h >= prev.hour ? (h - prev.hour) : (24 - prev.hour + h);
-
-        for (let i = 0; i < tl.length - 1; i++) {
-            if (h >= tl[i].hour && h <= tl[i + 1].hour) {
-                prev = tl[i];
-                next = tl[i + 1];
-                span = next.hour - prev.hour;
-                offset = h - prev.hour;
-                break;
-            }
-        }
-        const f = span > 0 ? Math.max(0, Math.min(1, offset / span)) : 0;
-        const lerp = (a, b) => a + (b - a) * f;
-        // Shortest-angle interpolation for wind direction
-        let dAng = ((next.windDirDeg - prev.windDirDeg + 540) % 360) - 180;
-        const windDirDeg = (prev.windDirDeg + dAng * f + 360) % 360;
-        const picked = f < 0.5 ? prev : next;
-
-        return {
-            tempC: lerp(prev.tempC, next.tempC),
-            cloudCover: lerp(prev.cloudCover, next.cloudCover),
-            windKmh: lerp(prev.windKmh, next.windKmh),
-            windDirDeg,
-            windLabel: degToCompass(windDirDeg),
-            precipMm: lerp(prev.precipMm || 0, next.precipMm || 0),
-            type: picked.type,
-            condition: picked.condition
-        };
-    }
-
-    async function fetchLiveWellingtonWeather() {
-        const btn = document.getElementById('weatherSourceBtn');
-        try {
-            const url = 'https://api.open-meteo.com/v1/forecast?latitude=-41.2866&longitude=174.7756&hourly=temperature_2m,precipitation,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m&daily=sunrise,sunset&timezone=Pacific%2FAuckland&forecast_days=1';
-            const res = await fetch(url);
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            const data = await res.json();
-            if (data.hourly && data.hourly.time) {
-                liveWeatherTimeline = data.hourly.time.slice(0, 24).map((iso, idx) => {
-                    const windKmh = data.hourly.wind_speed_10m[idx] || 0;
-                    const windDirDeg = data.hourly.wind_direction_10m[idx] || 320;
-                    const precipMm = data.hourly.precipitation[idx] || 0;
-                    const mapped = wmoToType(data.hourly.weather_code[idx] || 0, windKmh);
-                    return {
-                        hour: idx,
-                        tempC: data.hourly.temperature_2m[idx],
-                        condition: mapped.condition,
-                        type: precipMm > 0.2 ? 'rain' : mapped.type,
-                        cloudCover: data.hourly.cloud_cover[idx] || 0,
-                        windKmh,
-                        windDirDeg,
-                        windLabel: degToCompass(windDirDeg),
-                        precipMm
-                    };
-                });
-            }
-            if (data.daily && data.daily.sunrise && data.daily.sunrise[0]) {
-                const parseHr = (s) => {
-                    const parts = s.split('T')[1].split(':');
-                    return parseInt(parts[0], 10) + parseInt(parts[1], 10) / 60;
-                };
-                liveSunTimes = {
-                    sunrise: parseHr(data.daily.sunrise[0]),
-                    sunset: parseHr(data.daily.sunset[0])
-                };
-            }
-            refreshWeatherSummaryUI();
-        } catch (err) {
-            useLiveWeather = false;
-            refreshWeatherSummaryUI();
-        }
-    }
-
-    function formatHourHHMM(h) {
-        const wrapped = ((h % 24) + 24) % 24;
-        const hrs = Math.floor(wrapped);
-        const mins = Math.floor((wrapped - hrs) * 60);
-        return String(hrs).padStart(2, '0') + ':' + String(mins).padStart(2, '0');
-    }
-
-    function refreshWeatherSummaryUI() {
-        const btn = document.getElementById('weatherSourceBtn');
-        const isLiveActive = useLiveWeather && liveWeatherTimeline;
-        btn.innerText = isLiveActive ? '🟢 Weather: Live Wellington' : '📄 Weather: Config Forecast';
-
-        const tl = activeTimeline();
-        const temps = tl.map(x => x.tempC);
-        const winds = tl.map(x => x.windKmh);
-        const minT = Math.round(Math.min(...temps));
-        const maxT = Math.round(Math.max(...temps));
-        const maxW = Math.round(Math.max(...winds));
-
-        document.getElementById('dailyHiLoTemp').innerText = `${minT}°C – ${maxT}°C`;
-        document.getElementById('dailyMaxWind').innerText = `Peak Wind: ${maxW} km/h`;
-
-        const sun = getSunriseSunset();
-        document.getElementById('sunTimesBadge').innerText = `🌅 ${formatHourHHMM(sun.sunrise)} • 🌇 ${formatHourHHMM(sun.sunset)}`;
-        const srPct = (sun.sunrise / 24) * 100;
-        const ssPct = (sun.sunset / 24) * 100;
-        document.getElementById('sunriseMarker').style.left = srPct.toFixed(1) + '%';
-        document.getElementById('sunsetMarker').style.left = ssPct.toFixed(1) + '%';
-        document.getElementById('scrubberTrack').style.background = `linear-gradient(90deg,
-            #162238 0%,
-            #162238 ${Math.max(0, srPct - 3.5).toFixed(1)}%,
-            #f6ad55 ${srPct.toFixed(1)}%,
-            #63b3ed ${(srPct + 6).toFixed(1)}%,
-            #4299e1 50%,
-            #63b3ed ${Math.max(52, ssPct - 6).toFixed(1)}%,
-            #ed8936 ${ssPct.toFixed(1)}%,
-            #162238 ${Math.min(100, ssPct + 4).toFixed(1)}%,
-            #162238 100%)`;
-
-        const rainHours = tl.filter(x => x.type === 'rain' || x.precipMm > 0.2).length;
-        if (isLiveActive) {
-            document.getElementById('dailyWeatherSummaryText').innerText =
-                rainHours > 0
-                    ? `Live Open-Meteo NZ forecast: ${rainHours} wet hr(s) expected today; watch Wellington wind shifts.`
-                    : `Live Open-Meteo NZ forecast: Mostly dry across Wellington Harbour today (${minT}°–${maxT}°C).`;
-        } else {
-            document.getElementById('dailyWeatherSummaryText').innerText = state.weatherConfig.summary || '';
-        }
-
-        // Populate 8x 3-hour weather checkpoints above the progress bar
-        const strip = document.getElementById('hourlyWeatherStrip');
+        const strip = document.getElementById('compactWeatherStrip');
         strip.innerHTML = '';
-        for (let h = 0; h < 24; h += 3) {
-            const w = getWeatherAtHour(h);
-            const isNight = h < sun.sunrise || h > sun.sunset;
+
+        tl.forEach(item => {
             const slot = document.createElement('div');
-            slot.className = 'hour-slot';
-            slot.dataset.hour = h;
-            slot.innerHTML = `<div>${String(h).padStart(2,'0')}h</div><div style="font-size:13px;">${weatherEmojiFor(w, isNight)}</div><div>${Math.round(w.tempC)}°</div>`;
-            slot.addEventListener('click', () => {
-                simHour = h;
-                if (speedMode === 'realtime') {
-                    speedMode = 'loop';
-                    document.getElementById('speedPresetSelect').value = String(loopDurationSec);
-                }
-            });
+            slot.className = 'weather-slot';
+            let emoji = '☀️';
+            if (item.type === 'rain' || item.precipMm > 0) emoji = '🌧️';
+            else if (item.windKmh > 35) emoji = '💨';
+            else if (item.cloudCover > 70) emoji = '☁️';
+            else if (item.cloudCover > 30) emoji = '⛅';
+
+            slot.innerHTML = `
+                <div class="time">${String(item.hour).padStart(2,'0')}:00</div>
+                <div class="icon">${emoji}</div>
+                <div class="temp">${Math.round(item.tempC)}°C</div>
+            `;
             strip.appendChild(slot);
-        }
-    }
-
-    document.getElementById('weatherSourceBtn').addEventListener('click', () => {
-        if (!liveWeatherTimeline) {
-            useLiveWeather = true;
-            fetchLiveWellingtonWeather();
-        } else {
-            useLiveWeather = !useLiveWeather;
-            refreshWeatherSummaryUI();
-        }
-    });
-
-    // 4. Initialize Real Leaflet Map of Wellington
-    const defaultCenter = (fileData.animation && fileData.animation.mapCenter) || [-41.2895, 174.7815];
-    const defaultZoom = (fileData.animation && fileData.animation.mapZoom) || 13.5;
-
-    const map = L.map('wellingtonLeafletMap', {
-        center: defaultCenter,
-        zoom: defaultZoom,
-        zoomSnap: 0.25,
-        zoomControl: false
-    });
-    L.control.zoom({ position: 'bottomleft' }).addTo(map);
-
-    // Crisp CartoDB Voyager real street & coastline map of Wellington with authorized CARTO key
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=cb1_59f2_1_8a75ef4c4aa8e781723c87ea', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; CARTO',
-        subdomains: 'abcd',
-        maxZoom: 19
-    }).addTo(map);
-
-    // Layers for POI Pins, Route Lines, and Ben's Live Marker
-    const poiLayerGroup = L.layerGroup().addTo(map);
-    const routeBgLine = L.polyline([], { color: '#1a73e8', weight: 3.5, opacity: 0.42, dashArray: '6, 7' }).addTo(map);
-    const routeDoneLine = L.polyline([], { color: '#1a73e8', weight: 4.5, opacity: 0.88 }).addTo(map);
-
-    const benIcon = L.divIcon({
-        className: '',
-        html: `<div class="ben-marker-wrap">
-                 <div class="ben-pulse-ring"></div>
-                 <div class="ben-callout" id="benMapCallout">Ben</div>
-                 <div class="ben-core-dot">B</div>
-               </div>`,
-        iconSize: [0, 0]
-    });
-    const benMarker = L.marker(defaultCenter, { icon: benIcon, zIndexOffset: 1000 }).addTo(map);
-
-    let poiMarkersList = [];
-    function getLocationById(id) {
-        return state.locations.find(l => l.id === id) || state.locations[0] || { id: 'fallback', name: 'Wellington', lat: -41.2895, lng: 174.7815, icon: '📍' };
-    }
-
-    function renderLocationsAndPins() {
-        poiLayerGroup.clearLayers();
-        poiMarkersList = [];
-
-        const selectEl = document.getElementById('planLocationSelect');
-        selectEl.innerHTML = '';
-        const chipsEl = document.getElementById('poiChipsContainer');
-        chipsEl.innerHTML = '';
-
-        state.locations.forEach((loc, idx) => {
-            // Add to dropdown
-            const opt = document.createElement('option');
-            opt.value = loc.id;
-            opt.textContent = `${loc.icon || '📍'} ${loc.name}`;
-            selectEl.appendChild(opt);
-
-            // Add chip in drawer
-            const chip = document.createElement('span');
-            chip.className = 'poi-chip';
-            chip.innerHTML = `<span>${loc.icon || '📍'} <strong>${loc.name}</strong></span>`;
-            chip.addEventListener('click', () => {
-                map.flyTo([loc.lat, loc.lng], 15, { duration: 0.8 });
-            });
-            if (loc.id === 'home') {
-                const editHomeBtn = document.createElement('button');
-                editHomeBtn.className = 'del-x-btn';
-                editHomeBtn.innerHTML = '✏️';
-                editHomeBtn.style.fontSize = '11px';
-                editHomeBtn.title = 'Edit Home Location';
-                editHomeBtn.addEventListener('click', (ev) => {
-                    ev.stopPropagation();
-                    document.getElementById('locationsDrawer').open = true;
-                    document.getElementById('homeNameInput').focus();
-                });
-                chip.appendChild(editHomeBtn);
-            } else {
-                const delBtn = document.createElement('button');
-                delBtn.className = 'del-x-btn';
-                delBtn.innerHTML = '&times;';
-                delBtn.title = 'Remove location';
-                delBtn.addEventListener('click', (ev) => {
-                    ev.stopPropagation();
-                    state.locations.splice(idx, 1);
-                    persistState();
-                    renderLocationsAndPins();
-                    rebuildRoutes();
-                });
-                chip.appendChild(delBtn);
-            }
-            chipsEl.appendChild(chip);
-
-            if (loc.showPin !== false) {
-                const pinIcon = L.divIcon({
-                    className: '',
-                    html: `<div class="poi-pin" style="border-color: ${loc.color || '#5f6368'};">
-                             <span>${loc.icon || '📍'}</span><span>${loc.name.split('(')[0].trim()}</span>
-                           </div>`,
-                    iconSize: [0, 0]
-                });
-                const marker = L.marker([loc.lat, loc.lng], { icon: pinIcon }).addTo(poiLayerGroup);
-                marker.bindPopup(`<strong>${loc.icon || '📍'} ${loc.name}</strong><br><span style="color:#5f6368;font-size:12px;">Category: ${loc.category || 'POI'}<br>Coords: ${loc.lat.toFixed(4)}, ${loc.lng.toFixed(4)}</span>`);
-                poiMarkersList.push({ marker, loc });
-            }
         });
-
-        // Sync Home input fields with active Home location
-        const currHome = getLocationById('home');
-        if (currHome) {
-            const hName = document.getElementById('homeNameInput');
-            const hLat = document.getElementById('homeLatInput');
-            const hLng = document.getElementById('homeLngInput');
-            if (hName && document.activeElement !== hName) hName.value = currHome.name;
-            if (hLat && document.activeElement !== hLat) hLat.value = currHome.lat.toFixed(5);
-            if (hLng && document.activeElement !== hLng) hLng.value = currHome.lng.toFixed(5);
-        }
     }
+    renderWeatherStrip();
 
-    // 5. Real Street Routing & Day Plan Interpolation
-    // Uses OSRM foot/driving street polylines cached in sessionStorage with smooth fallback
-    const segmentRouteCache = {};
-
-    function parseHHMM(str) {
-        const [hh, mm] = String(str || '00:00').split(':').map(Number);
-        return (hh || 0) + (mm || 0) / 60;
-    }
-
-    function sortedPlan() {
-        return state.dayPlan.slice().sort((a, b) => parseHHMM(a.start) - parseHHMM(b.start));
-    }
-
-    function buildCurvedFallbackPath(a, b) {
-        const pts = [];
-        const steps = 16;
-        const midLat = (a.lat + b.lat) / 2 + (b.lng - a.lng) * 0.08;
-        const midLng = (a.lng + b.lng) / 2 - (b.lat - a.lat) * 0.08;
-        for (let i = 0; i <= steps; i++) {
-            const t = i / steps;
-            const u = 1 - t;
-            pts.push([
-                u * u * a.lat + 2 * u * t * midLat + t * t * b.lat,
-                u * u * a.lng + 2 * u * t * midLng + t * t * b.lng
-            ]);
-        }
-        return pts;
-    }
-
-    async function ensureStreetRoute(locA, locB) {
-        const key = `${locA.lat.toFixed(4)},${locA.lng.toFixed(4)}->${locB.lat.toFixed(4)},${locB.lng.toFixed(4)}`;
-        if (segmentRouteCache[key]) return segmentRouteCache[key];
-
-        // Immediate smooth curved path so rendering never blocks
-        segmentRouteCache[key] = buildCurvedFallbackPath(locA, locB);
-
-        const cachedSession = sessionStorage.getItem('osrm_' + key);
-        if (cachedSession) {
-            try {
-                segmentRouteCache[key] = JSON.parse(cachedSession);
-                refreshFullRoutePolyline();
-                return segmentRouteCache[key];
-            } catch (e) {}
-        }
-
-        try {
-            const url = `https://router.project-osrm.org/route/v1/foot/${locA.lng},${locA.lat};${locB.lng},${locB.lat}?overview=full&geometries=geojson`;
-            const res = await fetch(url);
-            if (res.ok) {
-                const json = await res.json();
-                if (json.routes && json.routes[0] && json.routes[0].geometry) {
-                    const coords = json.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
-                    if (coords.length > 1) {
-                        segmentRouteCache[key] = coords;
-                        try { sessionStorage.setItem('osrm_' + key, JSON.stringify(coords)); } catch (e) {}
-                        refreshFullRoutePolyline();
-                    }
-                }
-            }
-        } catch (err) {
-            // Keep smooth curved path offline
-        }
-        return segmentRouteCache[key];
-    }
-
-    function getCachedPath(locA, locB) {
-        if (locA.id === locB.id) return [[locA.lat, locA.lng]];
-        const key = `${locA.lat.toFixed(4)},${locA.lng.toFixed(4)}->${locB.lat.toFixed(4)},${locB.lng.toFixed(4)}`;
-        return segmentRouteCache[key] || buildCurvedFallbackPath(locA, locB);
-    }
-
-    function interpolateAlongPolyline(pts, progress) {
-        if (!pts || pts.length === 0) return defaultCenter;
-        if (pts.length === 1 || progress <= 0) return pts[0];
-        if (progress >= 1) return pts[pts.length - 1];
-
-        let totalDist = 0;
-        const segDists = [];
-        for (let i = 0; i < pts.length - 1; i++) {
-            const d = Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]);
-            segDists.push(d);
-            totalDist += d;
-        }
-        if (totalDist === 0) return pts[0];
-        let target = totalDist * progress;
-        for (let i = 0; i < segDists.length; i++) {
-            if (target <= segDists[i]) {
-                const f = segDists[i] > 0 ? target / segDists[i] : 0;
-                return [
-                    pts[i][0] + (pts[i + 1][0] - pts[i][0]) * f,
-                    pts[i][1] + (pts[i + 1][1] - pts[i][1]) * f
-                ];
-            }
-            target -= segDists[i];
-        }
-        return pts[pts.length - 1];
-    }
-
-    function refreshFullRoutePolyline() {
-        const plan = sortedPlan();
-        const fullCoords = [];
-        for (let i = 0; i < plan.length - 1; i++) {
-            const a = getLocationById(plan[i].locationId);
-            const b = getLocationById(plan[i + 1].locationId);
-            if (a.id !== b.id) {
-                const seg = getCachedPath(a, b);
-                seg.forEach(pt => fullCoords.push(pt));
-            }
-        }
-        routeBgLine.setLatLngs(fullCoords);
-    }
-
-    function rebuildRoutes() {
-        const plan = sortedPlan();
-        for (let i = 0; i < plan.length - 1; i++) {
-            const a = getLocationById(plan[i].locationId);
-            const b = getLocationById(plan[i + 1].locationId);
-            if (a.id !== b.id) ensureStreetRoute(a, b);
-        }
-        refreshFullRoutePolyline();
-        renderScrubberEventDots();
-    }
-
-    // Compute Ben's exact position + status at fractional hour h [0..24)
-    function computeBenStateAtHour(h) {
-        const plan = sortedPlan();
-        const home = getLocationById('home');
-        if (!plan.length) {
-            return { lat: home.lat, lng: home.lng, label: 'At Home', activeIdx: -1, traveledPts: [] };
-        }
-
-        const traveledPts = [];
-        // Check if inside an event or commuting between events
-        for (let i = 0; i < plan.length; i++) {
-            const ev = plan[i];
-            const s = parseHHMM(ev.start);
-            const e = parseHHMM(ev.end);
-            const loc = getLocationById(ev.locationId);
-
-            // Add previous completed transit segments (including smooth auto-commute for back-to-back events)
-            if (i > 0) {
-                const prevEv = plan[i - 1];
-                const rawPrevEnd = parseHHMM(prevEv.end);
-                const prevLoc = getLocationById(prevEv.locationId);
-                // Ensure at least a 15-minute (0.25h) smooth street commute window when changing locations
-                const transitStart = (prevLoc.id !== loc.id && (s - rawPrevEnd) < 0.25)
-                    ? Math.max(parseHHMM(prevEv.start) + 0.05, s - 0.25)
-                    : rawPrevEnd;
-
-                if (h >= s && prevLoc.id !== loc.id) {
-                    getCachedPath(prevLoc, loc).forEach(pt => traveledPts.push(pt));
-                } else if (prevLoc.id !== loc.id && h > transitStart && h < s) {
-                    // Currently commuting from prevLoc -> loc!
-                    const gap = Math.max(0.05, s - transitStart);
-                    const prog = Math.max(0, Math.min(1, (h - transitStart) / gap));
-                    const segPts = getCachedPath(prevLoc, loc);
-                    const pos = interpolateAlongPolyline(segPts, prog);
-                    const cutoff = Math.max(1, Math.floor(segPts.length * prog));
-                    segPts.slice(0, cutoff).forEach(pt => traveledPts.push(pt));
-                    traveledPts.push(pos);
-                    return {
-                        lat: pos[0],
-                        lng: pos[1],
-                        label: `🚶 → ${loc.name.split('(')[0].trim()}`,
-                        topBadge: `🚶 En route to ${loc.name.split('(')[0].trim()} (${ev.title})`,
-                        activeIdx: -1,
-                        traveledPts
-                    };
-                }
-            }
-
-            const nextEv = i < plan.length - 1 ? plan[i + 1] : null;
-            const nextLoc = nextEv ? getLocationById(nextEv.locationId) : null;
-            const nextStart = nextEv ? parseHHMM(nextEv.start) : 24;
-            const effectiveEnd = (nextEv && nextLoc.id !== loc.id && (nextStart - e) < 0.25)
-                ? Math.max(s + 0.05, nextStart - 0.25)
-                : e;
-
-            if (h >= s && h <= effectiveEnd) {
-                traveledPts.push([loc.lat, loc.lng]);
-                return {
-                    lat: loc.lat,
-                    lng: loc.lng,
-                    label: `${loc.icon || '📍'} ${ev.title.length > 22 ? ev.title.slice(0, 20) + '…' : ev.title}`,
-                    topBadge: `${loc.icon || '📍'} ${loc.name.split('(')[0].trim()} — ${ev.title}`,
-                    activeIdx: i,
-                    traveledPts
-                };
-            }
-        }
-
-        // Before first event or after last event -> Home
-        const first = plan[0];
-        if (h < parseHHMM(first.start)) {
-            const fLoc = getLocationById(first.locationId);
-            return { lat: fLoc.lat, lng: fLoc.lng, label: `${fLoc.icon} ${fLoc.name.split('(')[0].trim()}`, topBadge: `🏠 At ${fLoc.name}`, activeIdx: -1, traveledPts };
-        }
-        return { lat: home.lat, lng: home.lng, label: `🏠 Home Base`, topBadge: `🏠 Home Base`, activeIdx: -1, traveledPts };
-    }
-
-    // 6. Render Calendar / Agenda, To-Dos & Spotlight UI
+    // 3. Render Day Plan Agenda
     function renderAgendaUI() {
         const listEl = document.getElementById('agendaListContainer');
         listEl.innerHTML = '';
-        const plan = sortedPlan();
-
-        plan.forEach((ev, sortedIdx) => {
+        const plan = state.dayPlan || [];
+        plan.forEach(ev => {
             if (ev.showOnCalendar === false) return;
-            const loc = getLocationById(ev.locationId);
             const row = document.createElement('div');
-            row.className = 'agenda-item';
-            row.dataset.planIndex = sortedIdx;
+            row.className = 'agenda-row';
             row.innerHTML = `
-                <div style="display:flex; align-items:center; gap:7px; min-width:0;">
-                    <span class="agenda-time">${ev.start}–${ev.end}</span>
-                    <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${ev.title}</span>
-                </div>
-                <div style="display:flex; align-items:center; gap:4px;">
-                    <span class="agenda-loc-badge">${loc.icon || '📍'} ${loc.name.split('(')[0].trim()}</span>
-                    <button class="del-x-btn" title="Remove from plan">&times;</button>
+                <div>
+                    <span class="agenda-time">${ev.start} – ${ev.end}</span>
+                    <span style="margin-left: 10px;">${ev.title}</span>
                 </div>
             `;
-            // Click row -> jump animation to this event's start time & highlight on map
-            row.addEventListener('click', (e) => {
-                if (e.target.closest('.del-x-btn')) return;
-                simHour = parseHHMM(ev.start) + 0.05;
-                if (speedMode === 'realtime') {
-                    speedMode = 'loop';
-                    document.getElementById('speedPresetSelect').value = String(loopDurationSec);
-                }
-                map.panTo([loc.lat, loc.lng], { animate: true, duration: 0.5 });
-            });
-            row.querySelector('.del-x-btn').addEventListener('click', () => {
-                const origIdx = state.dayPlan.indexOf(ev);
-                if (origIdx > -1) state.dayPlan.splice(origIdx, 1);
-                persistState();
-                renderAgendaUI();
-                rebuildRoutes();
-            });
             listEl.appendChild(row);
         });
     }
+    renderAgendaUI();
 
-    function renderScrubberEventDots() {
-        const wrap = document.getElementById('scrubberEventDots');
-        wrap.innerHTML = '';
-        sortedPlan().forEach(ev => {
-            if (ev.showOnCalendar === false) return;
-            const pct = (parseHHMM(ev.start) / 24) * 100;
-            const dot = document.createElement('div');
-            dot.className = 'scrubber-event-dot';
-            dot.style.left = pct.toFixed(1) + '%';
-            dot.title = `${ev.start} ${ev.title}`;
-            wrap.appendChild(dot);
-        });
-    }
-
+    // 4. Render Reorderable To-Do List
     function renderTodosUI() {
         const container = document.getElementById('todoListContainer');
         container.innerHTML = '';
         let doneCount = 0;
+
         state.todos.forEach((todo, idx) => {
             if (todo.done) doneCount++;
             const div = document.createElement('div');
             div.className = 'todo-item' + (todo.done ? ' completed' : '');
             div.innerHTML = `
-                <label>
+                <div class="todo-left">
                     <input type="checkbox" ${todo.done ? 'checked' : ''}>
                     <span class="todo-text">${todo.text}</span>
-                </label>
-                <div style="display:flex; align-items:center; gap:4px;">
-                    ${todo.tag ? `<span class="todo-tag">${todo.tag}</span>` : ''}
-                    <button class="del-x-btn" title="Delete task">&times;</button>
+                </div>
+                <div class="todo-actions">
+                    <button class="sketch-btn move-up" title="Move Up" ${idx === 0 ? 'disabled style="opacity:0.4;"' : ''}>▲</button>
+                    <button class="sketch-btn move-down" title="Move Down" ${idx === state.todos.length - 1 ? 'disabled style="opacity:0.4;"' : ''}>▼</button>
+                    <button class="sketch-btn delete-task" title="Delete">&times;</button>
                 </div>
             `;
+
             div.querySelector('input').addEventListener('change', (e) => {
                 state.todos[idx].done = e.target.checked;
                 persistState();
                 renderTodosUI();
             });
-            div.querySelector('.del-x-btn').addEventListener('click', () => {
+
+            div.querySelector('.move-up').addEventListener('click', () => {
+                if (idx > 0) {
+                    const temp = state.todos[idx];
+                    state.todos[idx] = state.todos[idx - 1];
+                    state.todos[idx - 1] = temp;
+                    persistState();
+                    renderTodosUI();
+                }
+            });
+
+            div.querySelector('.move-down').addEventListener('click', () => {
+                if (idx < state.todos.length - 1) {
+                    const temp = state.todos[idx];
+                    state.todos[idx] = state.todos[idx + 1];
+                    state.todos[idx + 1] = temp;
+                    persistState();
+                    renderTodosUI();
+                }
+            });
+
+            div.querySelector('.delete-task').addEventListener('click', () => {
                 state.todos.splice(idx, 1);
                 persistState();
                 renderTodosUI();
             });
+
             container.appendChild(div);
         });
         document.getElementById('todoCountBadge').innerText = `${doneCount}/${state.todos.length} done`;
     }
-
-    function renderSpotlightUI() {
-        const sp = state.dailySpotlight || {};
-        document.getElementById('spotlightTopicLabel').innerText = sp.interestTopic || 'Daily Focus';
-        document.getElementById('spotlightMorningTask').innerText = sp.morningTask || 'Set a morning focus task';
-        document.getElementById('spotlightFact').innerText = sp.factOfTheDay || '';
-        const w = sp.wordOfTheDay || {};
-        document.getElementById('spotlightWordTerm').innerText = w.term || '';
-        document.getElementById('spotlightWordPron').innerText = w.pronunciation || '';
-        document.getElementById('spotlightWordDef').innerText = w.definition || '';
-    }
-
-    // Interactive Form Handlers (Add Plan, Add Todo, Add Location, Edit Spotlight)
-    document.getElementById('toggleAddPlanBtn').addEventListener('click', () => {
-        document.getElementById('addPlanFormBox').classList.toggle('open');
-    });
-
-    document.getElementById('savePlanBtn').addEventListener('click', () => {
-        const start = document.getElementById('planStartInput').value || '10:00';
-        const end = document.getElementById('planEndInput').value || '11:00';
-        const locationId = document.getElementById('planLocationSelect').value;
-        const title = document.getElementById('planTitleInput').value.trim();
-        if (!title) return;
-        state.dayPlan.push({ start, end, locationId, title, type: 'work', showOnCalendar: true });
-        document.getElementById('planTitleInput').value = '';
-        document.getElementById('addPlanFormBox').classList.remove('open');
-        persistState();
-        renderAgendaUI();
-        rebuildRoutes();
-    });
+    renderTodosUI();
 
     function addNewTodo() {
         const input = document.getElementById('newTodoInput');
@@ -1913,701 +519,24 @@
         persistState();
         renderTodosUI();
     }
+
     document.getElementById('addTodoBtn').addEventListener('click', addNewTodo);
     document.getElementById('newTodoInput').addEventListener('keydown', (e) => {
         if (e.key === 'Enter') addNewTodo();
     });
 
-    document.getElementById('toggleEditSpotlightBtn').addEventListener('click', () => {
-        const box = document.getElementById('editSpotlightFormBox');
+    // 5. Spotlight UI
+    function renderSpotlightUI() {
         const sp = state.dailySpotlight || {};
-        document.getElementById('editTopicInput').value = sp.interestTopic || '';
-        document.getElementById('editMorningTaskInput').value = sp.morningTask || '';
-        document.getElementById('editFactInput').value = sp.factOfTheDay || '';
-        document.getElementById('editWordTermInput').value = (sp.wordOfTheDay && sp.wordOfTheDay.term) || '';
-        document.getElementById('editWordDefInput').value = (sp.wordOfTheDay && sp.wordOfTheDay.definition) || '';
-        box.classList.toggle('open');
-    });
-
-    document.getElementById('saveSpotlightBtn').addEventListener('click', () => {
-        state.dailySpotlight = {
-            interestTopic: document.getElementById('editTopicInput').value.trim(),
-            morningTask: document.getElementById('editMorningTaskInput').value.trim(),
-            factOfTheDay: document.getElementById('editFactInput').value.trim(),
-            wordOfTheDay: {
-                term: document.getElementById('editWordTermInput').value.trim(),
-                pronunciation: '',
-                definition: document.getElementById('editWordDefInput').value.trim()
-            }
-        };
-        document.getElementById('editSpotlightFormBox').classList.remove('open');
-        persistState();
-        renderSpotlightUI();
-    });
-
-    // Map Controls & Add Location Picker
-    let pickingMapLocation = false;
-    let pickingHomeLocation = false;
-    let followBenMode = false;
-
-    function startMapPickMode() {
-        pickingMapLocation = true;
-        pickingHomeLocation = false;
-        document.getElementById('mapPickBanner').innerText = '👆 Click anywhere on the Wellington map to place your new location! (Esc to cancel)';
-        document.getElementById('mapPickBanner').style.display = 'block';
-        document.getElementById('locationsDrawer').open = true;
-        document.getElementById('wellingtonLeafletMap').style.cursor = 'crosshair';
+        document.getElementById('spotlightTopicLabel').innerText = sp.interestTopic || 'Daily Focus';
+        document.getElementById('spotlightMorningTask').innerText = sp.morningTask || '';
+        document.getElementById('spotlightFact').innerText = sp.factOfTheDay || '';
+        const w = sp.wordOfTheDay || {};
+        document.getElementById('spotlightWordTerm').innerText = w.term || '';
+        document.getElementById('spotlightWordDef').innerText = w.definition || '';
     }
-    function startHomePickMode() {
-        pickingHomeLocation = true;
-        pickingMapLocation = false;
-        document.getElementById('mapPickBanner').innerText = '🏠 Click on the Wellington map to set your new HOME location! (Esc to cancel)';
-        document.getElementById('mapPickBanner').style.display = 'block';
-        document.getElementById('locationsDrawer').open = true;
-        document.getElementById('wellingtonLeafletMap').style.cursor = 'crosshair';
-    }
-    function stopAllPickModes() {
-        pickingMapLocation = false;
-        pickingHomeLocation = false;
-        document.getElementById('mapPickBanner').style.display = 'none';
-        document.getElementById('wellingtonLeafletMap').style.cursor = '';
-    }
-
-    document.getElementById('quickAddLocBtn').addEventListener('click', startMapPickMode);
-    document.getElementById('pickOnMapDrawerBtn').addEventListener('click', startMapPickMode);
-    document.getElementById('pickHomeOnMapBtn').addEventListener('click', startHomePickMode);
-    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') stopAllPickModes(); });
-
-    map.on('click', (e) => {
-        if (pickingHomeLocation) {
-            document.getElementById('homeLatInput').value = e.latlng.lat.toFixed(5);
-            document.getElementById('homeLngInput').value = e.latlng.lng.toFixed(5);
-            stopAllPickModes();
-            document.getElementById('saveHomeLocBtn').click();
-            return;
-        }
-        if (!pickingMapLocation) return;
-        document.getElementById('newLocLatInput').value = e.latlng.lat.toFixed(5);
-        document.getElementById('newLocLngInput').value = e.latlng.lng.toFixed(5);
-        stopAllPickModes();
-        document.getElementById('newLocNameInput').focus();
-    });
-
-    document.getElementById('saveHomeLocBtn').addEventListener('click', () => {
-        const name = document.getElementById('homeNameInput').value.trim() || 'Home Base';
-        const lat = parseFloat(document.getElementById('homeLatInput').value);
-        const lng = parseFloat(document.getElementById('homeLngInput').value);
-        if (isNaN(lat) || isNaN(lng)) {
-            alert('Please enter valid coordinates for your Home location.');
-            return;
-        }
-        const hIdx = state.locations.findIndex(l => l.id === 'home');
-        if (hIdx === -1) {
-            state.locations.unshift({ id: 'home', name, lat, lng, icon: '🏠', color: '#1a73e8', category: 'Home', showPin: true });
-        } else {
-            state.locations[hIdx].name = name;
-            state.locations[hIdx].lat = lat;
-            state.locations[hIdx].lng = lng;
-        }
-        persistState();
-        renderLocationsAndPins();
-        rebuildRoutes();
-        map.flyTo([lat, lng], 15, { duration: 0.8 });
-    });
-
-    document.getElementById('addLocationSubmitBtn').addEventListener('click', () => {
-        const icon = document.getElementById('newLocIconInput').value.trim() || '📌';
-        const name = document.getElementById('newLocNameInput').value.trim();
-        const category = document.getElementById('newLocCategoryInput').value.trim() || 'Custom';
-        const lat = parseFloat(document.getElementById('newLocLatInput').value);
-        const lng = parseFloat(document.getElementById('newLocLngInput').value);
-        if (!name || isNaN(lat) || isNaN(lng)) {
-            alert('Please enter a place name and valid Wellington coordinates (or click "Pick Location on Map").');
-            return;
-        }
-        const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '_') + '_' + (Date.now() % 1000);
-        state.locations.push({ id, name, lat, lng, icon, color: '#1a73e8', category, showPin: true });
-        document.getElementById('newLocNameInput').value = '';
-        persistState();
-        renderLocationsAndPins();
-        map.flyTo([lat, lng], 14.5, { duration: 0.7 });
-    });
-
-    document.getElementById('recenterCityBtn').addEventListener('click', () => {
-        followBenMode = false;
-        document.getElementById('followBenBtn').classList.remove('active');
-        map.flyTo(defaultCenter, defaultZoom, { duration: 0.6 });
-    });
-
-    document.getElementById('fitAllPoiBtn').addEventListener('click', () => {
-        followBenMode = false;
-        document.getElementById('followBenBtn').classList.remove('active');
-        const bounds = L.latLngBounds(state.locations.map(l => [l.lat, l.lng]));
-        map.flyToBounds(bounds.pad(0.12), { duration: 0.7 });
-    });
-
-    document.getElementById('followBenBtn').addEventListener('click', (e) => {
-        followBenMode = !followBenMode;
-        e.currentTarget.classList.toggle('active', followBenMode);
-    });
-
-    document.getElementById('copyConfigBtn').addEventListener('click', async () => {
-        const exportObj = {
-            version: state.version,
-            dateLabel: todayNzLabel,
-            animation: fileData.animation || { defaultLoopSeconds: 24, startHour: 6.5 },
-            weather: state.weatherConfig,
-            locations: state.locations,
-            dayPlan: state.dayPlan,
-            todos: state.todos,
-            dailySpotlight: state.dailySpotlight
-        };
-        const code = 'window.BRIEFING_DATA = ' + JSON.stringify(exportObj, null, 4) + ';\n';
-        try {
-            await navigator.clipboard.writeText(code);
-            const btn = document.getElementById('copyConfigBtn');
-            const prev = btn.innerText;
-            btn.innerText = '✅ Copied briefing-data.js!';
-            setTimeout(() => { btn.innerText = prev; }, 2000);
-        } catch (err) {
-            alert('Copy failed — check browser clipboard permissions.');
-        }
-    });
-
-    document.getElementById('resetConfigBtn').addEventListener('click', () => {
-        localStorage.removeItem(STORAGE_KEY);
-        state = buildFreshState();
-        renderLocationsAndPins();
-        renderAgendaUI();
-        renderTodosUI();
-        renderSpotlightUI();
-        rebuildRoutes();
-    });
-
-    // 7. Celestial Horizon & Top-Down Weather Particle Canvases
-    const skyCanvas = document.getElementById('skyHorizonCanvas');
-    const skyCtx = skyCanvas.getContext('2d');
-    const weatherCanvas = document.getElementById('mapWeatherCanvas');
-    const wCtx = weatherCanvas.getContext('2d');
-
-    function resizeCanvases() {
-        const dpr = window.devicePixelRatio || 1;
-        const sRect = skyCanvas.parentElement.getBoundingClientRect();
-        skyCanvas.width = sRect.width * dpr;
-        skyCanvas.height = sRect.height * dpr;
-        skyCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-        const mRect = weatherCanvas.parentElement.getBoundingClientRect();
-        weatherCanvas.width = mRect.width * dpr;
-        weatherCanvas.height = mRect.height * dpr;
-        wCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        map.invalidateSize();
-    }
-    window.addEventListener('resize', resizeCanvases);
-
-    // Pre-seeded clouds, wind streamlines & raindrops for smooth 60fps weather animation
-    const cloudParticles = Array.from({ length: 18 }, (_, i) => ({
-        x: (i * 97) % 800,
-        y: (i * 67) % 450,
-        scale: 0.7 + (i % 5) * 0.22,
-        speedMul: 0.75 + (i % 4) * 0.15
-    }));
-    const windParticles = Array.from({ length: 34 }, (_, i) => ({
-        x: (i * 53) % 800,
-        y: (i * 41) % 450,
-        len: 22 + (i % 4) * 10,
-        phase: i * 0.7
-    }));
-    const rainDrops = Array.from({ length: 95 }, (_, i) => ({
-        x: (i * 37) % 800,
-        y: (i * 29) % 450,
-        speed: 260 + (i % 5) * 45
-    }));
-
-    function lerpRGB(c1, c2, t) {
-        const f = Math.max(0, Math.min(1, t));
-        return `rgb(${Math.round(c1[0] + (c2[0] - c1[0]) * f)}, ${Math.round(c1[1] + (c2[1] - c1[1]) * f)}, ${Math.round(c1[2] + (c2[2] - c1[2]) * f)})`;
-    }
-
-    function drawSkyHorizon(h, weather, sun) {
-        const w = skyCanvas.width / (window.devicePixelRatio || 1);
-        const ht = skyCanvas.height / (window.devicePixelRatio || 1);
-        skyCtx.clearRect(0, 0, w, ht);
-
-        // Compute sky palette from hour relative to sunrise/sunset
-        let topCol = [12, 22, 45], botCol = [24, 42, 74];
-        let phaseText = '🌙 Night';
-        if (h >= sun.sunrise - 0.9 && h < sun.sunrise + 0.8) {
-            const p = (h - (sun.sunrise - 0.9)) / 1.7;
-            topCol = p < 0.5 ? [28, 38, 78] : [62, 122, 198];
-            botCol = p < 0.5 ? [225, 112, 85] : [250, 190, 105];
-            phaseText = '🌅 Sunrise';
-        } else if (h >= sun.sunrise + 0.8 && h <= sun.sunset - 1.0) {
-            topCol = [38, 122, 212];
-            botCol = [138, 196, 248];
-            phaseText = h < 12 ? '☀️ Morning' : (h < 14 ? '☀️ Solar Noon' : '🌤️ Afternoon');
-        } else if (h > sun.sunset - 1.0 && h <= sun.sunset + 0.9) {
-            const p = (h - (sun.sunset - 1.0)) / 1.9;
-            topCol = p < 0.5 ? [52, 78, 142] : [18, 28, 58];
-            botCol = p < 0.5 ? [242, 118, 68] : [132, 62, 92];
-            phaseText = '🌇 Sunset';
-        }
-
-        // Mute sky brightness when cloud cover is heavy
-        const overcastDim = (weather.cloudCover / 100) * 0.42;
-        const gray = [115, 126, 138];
-        const grad = skyCtx.createLinearGradient(0, 0, 0, ht);
-        grad.addColorStop(0, lerpRGB(topCol, gray, overcastDim));
-        grad.addColorStop(1, lerpRGB(botCol, gray, overcastDim));
-        skyCtx.fillStyle = grad;
-        skyCtx.fillRect(0, 0, w, ht);
-
-        document.getElementById('dayPhaseReadout').innerText = phaseText;
-
-        const isDay = h >= sun.sunrise - 0.25 && h <= sun.sunset + 0.25;
-        if (!isDay) {
-            // Stars + Southern Cross at night
-            skyCtx.fillStyle = 'rgba(255,255,255,0.75)';
-            for (let i = 0; i < 24; i++) {
-                const sx = ((i * 73 + 19) % 100) / 100 * w;
-                const sy = ((i * 31 + 7) % 62) / 100 * ht;
-                skyCtx.fillRect(sx, sy, 1.5, 1.5);
-            }
-            // Moon arcing across night sky
-            const nightSpan = (24 - sun.sunset) + sun.sunrise;
-            const nightElapsed = h > sun.sunset ? (h - sun.sunset) : (24 - sun.sunset + h);
-            const mp = Math.max(0, Math.min(1, nightElapsed / nightSpan));
-            const mx = w * (0.08 + mp * 0.84);
-            const my = ht * 0.78 - Math.sin(mp * Math.PI) * (ht * 0.54);
-            skyCtx.beginPath();
-            skyCtx.arc(mx, my, 8, 0, Math.PI * 2);
-            skyCtx.fillStyle = '#f8fafc';
-            skyCtx.shadowColor = '#e2e8f0';
-            skyCtx.shadowBlur = 10;
-            skyCtx.fill();
-            skyCtx.shadowBlur = 0;
-        } else {
-            // Sun rising on East (left), peaking at North (center), falling on West (right)
-            const sp = Math.max(0, Math.min(1, (h - sun.sunrise) / (sun.sunset - sun.sunrise)));
-            const sx = w * (0.06 + sp * 0.88);
-            const sy = ht * 0.86 - Math.sin(sp * Math.PI) * (ht * 0.64);
-
-            // Subtle dashed sun trajectory guide
-            skyCtx.beginPath();
-            for (let k = 0; k <= 30; k++) {
-                const kp = k / 30;
-                const kx = w * (0.06 + kp * 0.88);
-                const ky = ht * 0.86 - Math.sin(kp * Math.PI) * (ht * 0.64);
-                if (k === 0) skyCtx.moveTo(kx, ky); else skyCtx.lineTo(kx, ky);
-            }
-            skyCtx.strokeStyle = 'rgba(255,255,255,0.22)';
-            skyCtx.setLineDash([3, 4]);
-            skyCtx.lineWidth = 1;
-            skyCtx.stroke();
-            skyCtx.setLineDash([]);
-
-            // Glowing Sun disc
-            skyCtx.beginPath();
-            skyCtx.arc(sx, sy, 10, 0, Math.PI * 2);
-            skyCtx.fillStyle = '#fde047';
-            skyCtx.shadowColor = '#fb923c';
-            skyCtx.shadowBlur = 16;
-            skyCtx.fill();
-            skyCtx.shadowBlur = 0;
-        }
-
-        // Horizon Clouds when cloudy
-        if (weather.cloudCover > 20) {
-            const cAlpha = Math.min(0.75, (weather.cloudCover / 100) * 0.75);
-            skyCtx.fillStyle = weather.type === 'rain' ? `rgba(90, 102, 118, ${cAlpha})` : `rgba(255, 255, 255, ${cAlpha})`;
-            const drift = (performance.now() * 0.015) % w;
-            for (let i = 0; i < 5; i++) {
-                const cx = ((i * w * 0.24 + drift) % (w + 80)) - 40;
-                const cy = 14 + (i % 2) * 10;
-                skyCtx.beginPath();
-                skyCtx.arc(cx, cy, 12, 0, Math.PI * 2);
-                skyCtx.arc(cx + 11, cy - 3, 14, 0, Math.PI * 2);
-                skyCtx.arc(cx + 23, cy + 1, 11, 0, Math.PI * 2);
-                skyCtx.fill();
-            }
-        }
-
-        // Wellington Harbour & Hills Silhouette along bottom edge
-        skyCtx.beginPath();
-        skyCtx.moveTo(0, ht);
-        skyCtx.lineTo(0, ht - 14);
-        skyCtx.quadraticCurveTo(w * 0.14, ht - 24, w * 0.28, ht - 11); // Eastern Remutaka ranges
-        skyCtx.lineTo(w * 0.62, ht - 9); // Harbour water plane
-        skyCtx.quadraticCurveTo(w * 0.70, ht - 22, w * 0.78, ht - 13); // Mt Victoria
-        skyCtx.quadraticCurveTo(w * 0.90, ht - 26, w, ht - 15); // Western Kelburn/Makara hills
-        skyCtx.lineTo(w, ht);
-        skyCtx.closePath();
-        skyCtx.fillStyle = isDay ? 'rgba(20, 38, 34, 0.52)' : 'rgba(8, 15, 28, 0.82)';
-        skyCtx.fill();
-    }
-
-    function drawMapAtmosphereAndWeather(h, weather, sun, dtSec) {
-        const w = weatherCanvas.width / (window.devicePixelRatio || 1);
-        const ht = weatherCanvas.height / (window.devicePixelRatio || 1);
-        wCtx.clearRect(0, 0, w, ht);
-
-        // 1. Time-of-Day Ambient Lighting & Directional Sunlight over Real Wellington Map
-        const isNight = h < sun.sunrise - 0.3 || h > sun.sunset + 0.3;
-        let nightAlpha = 0;
-        if (h < sun.sunrise - 0.6 || h > sun.sunset + 0.6) {
-            nightAlpha = 0.44;
-        } else if (h < sun.sunrise + 0.5) {
-            nightAlpha = Math.max(0, 0.44 * (1 - (h - (sun.sunrise - 0.6)) / 1.1));
-        } else if (h > sun.sunset - 0.5) {
-            nightAlpha = Math.min(0.44, 0.44 * ((h - (sun.sunset - 0.5)) / 1.1));
-        }
-
-        // Dawn / Dusk directional golden-rose sunlight sweep (East at dawn, West at sunset)
-        if (Math.abs(h - sun.sunrise) < 1.1) {
-            const intensity = (1 - Math.abs(h - sun.sunrise) / 1.1) * 0.28;
-            const dawnGrad = wCtx.createLinearGradient(w, ht * 0.4, 0, ht * 0.6); // From East (right)
-            dawnGrad.addColorStop(0, `rgba(255, 158, 68, ${intensity})`);
-            dawnGrad.addColorStop(1, 'rgba(255, 158, 68, 0)');
-            wCtx.fillStyle = dawnGrad;
-            wCtx.fillRect(0, 0, w, ht);
-        } else if (Math.abs(h - sun.sunset) < 1.1) {
-            const intensity = (1 - Math.abs(h - sun.sunset) / 1.1) * 0.30;
-            const duskGrad = wCtx.createLinearGradient(0, ht * 0.3, w, ht * 0.6); // From West (left)
-            duskGrad.addColorStop(0, `rgba(251, 113, 62, ${intensity})`);
-            duskGrad.addColorStop(1, 'rgba(251, 113, 62, 0)');
-            wCtx.fillStyle = duskGrad;
-            wCtx.fillRect(0, 0, w, ht);
-        } else if (!isNight && weather.cloudCover < 45) {
-            // Southern Hemisphere daytime sun azimuth sheen (East -> North -> West)
-            const sp = (h - sun.sunrise) / (sun.sunset - sun.sunrise);
-            const sunMapX = w * (1 - sp); // East is right, West is left on north-up map!
-            const sunSheen = wCtx.createRadialGradient(sunMapX, 0, 10, sunMapX, 0, w * 0.75);
-            sunSheen.addColorStop(0, 'rgba(255, 244, 180, 0.18)');
-            sunSheen.addColorStop(1, 'rgba(255, 244, 180, 0)');
-            wCtx.fillStyle = sunSheen;
-            wCtx.fillRect(0, 0, w, ht);
-        }
-
-        // Night Indigo Veil + Warm Glowing Wellington City Lights anchored to real lat/lng!
-        if (nightAlpha > 0.02) {
-            wCtx.fillStyle = `rgba(11, 22, 48, ${nightAlpha})`;
-            wCtx.fillRect(0, 0, w, ht);
-
-            if (nightAlpha > 0.16) {
-                const glowAlpha = Math.min(0.65, (nightAlpha - 0.12) * 1.6);
-                state.locations.forEach(loc => {
-                    const pt = map.latLngToContainerPoint([loc.lat, loc.lng]);
-                    if (pt.x >= -40 && pt.x <= w + 40 && pt.y >= -40 && pt.y <= ht + 40) {
-                        const rad = wCtx.createRadialGradient(pt.x, pt.y, 2, pt.x, pt.y, 28);
-                        rad.addColorStop(0, `rgba(255, 214, 102, ${glowAlpha})`);
-                        rad.addColorStop(1, 'rgba(255, 214, 102, 0)');
-                        wCtx.fillStyle = rad;
-                        wCtx.beginPath();
-                        wCtx.arc(pt.x, pt.y, 28, 0, Math.PI * 2);
-                        wCtx.fill();
-                    }
-                });
-            }
-        }
-
-        // Toggle POI night-lit CSS glow
-        document.querySelectorAll('.poi-pin').forEach(el => {
-            el.classList.toggle('night-lit', nightAlpha > 0.24);
-        });
-
-        // 2. Wind Vector Calculation (windDirDeg is meteorological "FROM" bearing)
-        // Bearing 0=N (blows South: +y), 90=E (blows West: -x), 180=S (blows North: -y), 315=NW (blows SE: +x,+y)
-        const toRad = ((weather.windDirDeg + 180) % 360) * Math.PI / 180;
-        const vx = Math.sin(toRad);
-        const vy = -Math.cos(toRad);
-        const speedPx = Math.max(12, weather.windKmh * 1.9);
-
-        // 3. Animated Drifting Clouds & Ground Shadows
-        const activeClouds = Math.round((weather.cloudCover / 100) * cloudParticles.length);
-        const cloudOpacity = Math.min(0.52, 0.14 + (weather.cloudCover / 100) * 0.38);
-        const isRainy = weather.type === 'rain' || weather.precipMm > 0.2;
-
-        for (let i = 0; i < activeClouds; i++) {
-            const c = cloudParticles[i];
-            c.x = (c.x + vx * speedPx * 0.42 * c.speedMul * dtSec + w + 160) % (w + 160);
-            c.y = (c.y + vy * speedPx * 0.42 * c.speedMul * dtSec + ht + 140) % (ht + 140);
-            const cx = c.x - 80;
-            const cy = c.y - 70;
-            const r = 26 * c.scale;
-
-            // Subtle ground shadow during daytime
-            if (!isNight) {
-                wCtx.fillStyle = 'rgba(20, 30, 45, 0.08)';
-                wCtx.beginPath();
-                wCtx.arc(cx + 12, cy + 14, r * 1.1, 0, Math.PI * 2);
-                wCtx.fill();
-            }
-
-            // Multi-puff cloud body
-            wCtx.fillStyle = isRainy
-                ? `rgba(112, 124, 140, ${cloudOpacity + 0.08})`
-                : `rgba(255, 255, 255, ${cloudOpacity})`;
-            wCtx.beginPath();
-            wCtx.arc(cx, cy, r, 0, Math.PI * 2);
-            wCtx.arc(cx + r * 0.85, cy - r * 0.2, r * 0.85, 0, Math.PI * 2);
-            wCtx.arc(cx - r * 0.75, cy + r * 0.15, r * 0.72, 0, Math.PI * 2);
-            wCtx.fill();
-        }
-
-        // 4. Wellington Wind Streamlines (scales with windKmh)
-        const activeWinds = Math.min(windParticles.length, Math.floor(weather.windKmh * 0.65));
-        if (activeWinds > 2) {
-            wCtx.strokeStyle = isNight ? 'rgba(200, 225, 255, 0.34)' : 'rgba(255, 255, 255, 0.58)';
-            wCtx.lineWidth = weather.windKmh > 35 ? 1.8 : 1.2;
-            for (let i = 0; i < activeWinds; i++) {
-                const wp = windParticles[i];
-                wp.x = (wp.x + vx * speedPx * 2.2 * dtSec + w + 60) % (w + 60);
-                wp.y = (wp.y + vy * speedPx * 2.2 * dtSec + ht + 60) % (ht + 60);
-                const sx = wp.x - 30;
-                const sy = wp.y - 30;
-                wCtx.beginPath();
-                wCtx.moveTo(sx, sy);
-                wCtx.lineTo(sx + vx * wp.len, sy + vy * wp.len);
-                wCtx.stroke();
-            }
-        }
-
-        // 5. Rain / Showers Animation + Harbour Splash Ripples
-        if (isRainy) {
-            const rainIntensity = Math.min(rainDrops.length, Math.max(35, Math.round(weather.precipMm * 32)));
-            wCtx.strokeStyle = 'rgba(125, 185, 250, 0.75)';
-            wCtx.lineWidth = 1.4;
-            for (let i = 0; i < rainIntensity; i++) {
-                const rd = rainDrops[i];
-                rd.x = (rd.x + vx * speedPx * 1.1 * dtSec + w) % w;
-                rd.y = (rd.y + rd.speed * dtSec) % ht;
-                wCtx.beginPath();
-                wCtx.moveTo(rd.x, rd.y);
-                wCtx.lineTo(rd.x + vx * 5, rd.y + 11);
-                wCtx.stroke();
-            }
-            // Subtle raindrop splash ripples
-            const nowT = performance.now() * 0.0025;
-            wCtx.strokeStyle = 'rgba(180, 220, 255, 0.42)';
-            wCtx.lineWidth = 1;
-            for (let r = 0; r < 8; r++) {
-                const ph = (nowT + r * 0.37) % 1;
-                const rx = ((r * 131 + 45) % Math.max(100, w - 40)) + 20;
-                const ry = ((r * 89 + 55) % Math.max(100, ht - 40)) + 20;
-                wCtx.beginPath();
-                wCtx.arc(rx, ry, 2 + ph * 9, 0, Math.PI * 2);
-                wCtx.stroke();
-            }
-        }
-
-        // 6. Top-Left Solar & Wind Compass Rose HUD (Sun Azimuth + Live Wind Vector)
-        const cx = 36, cy = 36, cr = 23;
-        wCtx.save();
-        wCtx.beginPath();
-        wCtx.arc(cx, cy, cr + 5, 0, Math.PI * 2);
-        wCtx.fillStyle = 'rgba(15, 23, 42, 0.68)';
-        wCtx.fill();
-        wCtx.strokeStyle = 'rgba(255,255,255,0.32)';
-        wCtx.lineWidth = 1.2;
-        wCtx.stroke();
-
-        // Cardinal ticks N E S W
-        wCtx.fillStyle = 'rgba(255,255,255,0.85)';
-        wCtx.font = 'bold 8px Arial';
-        wCtx.textAlign = 'center';
-        wCtx.textBaseline = 'middle';
-        wCtx.fillText('N', cx, cy - cr + 4);
-        wCtx.fillText('S', cx, cy + cr - 4);
-        wCtx.fillText('E', cx + cr - 4, cy);
-        wCtx.fillText('W', cx - cr + 5, cy);
-
-        // Wind Vector Arrow inside Compass (points where wind is blowing!)
-        const arrowLen = 11;
-        const ax = cx + vx * arrowLen;
-        const ay = cy + vy * arrowLen;
-        wCtx.strokeStyle = '#60a5fa';
-        wCtx.lineWidth = 2;
-        wCtx.beginPath();
-        wCtx.moveTo(cx - vx * 7, cy - vy * 7);
-        wCtx.lineTo(ax, ay);
-        wCtx.stroke();
-        // Arrowhead
-        const headAng = Math.atan2(vy, vx);
-        wCtx.fillStyle = '#60a5fa';
-        wCtx.beginPath();
-        wCtx.moveTo(ax, ay);
-        wCtx.lineTo(ax - 5 * Math.cos(headAng - 0.55), ay - 5 * Math.sin(headAng - 0.55));
-        wCtx.lineTo(ax - 5 * Math.cos(headAng + 0.55), ay - 5 * Math.sin(headAng + 0.55));
-        wCtx.closePath();
-        wCtx.fill();
-
-        // Orbiting Sun / Moon Azimuth Dot on Compass Perimeter (Southern Hemisphere: E -> N -> W!)
-        if (!isNight) {
-            const sp = Math.max(0, Math.min(1, (h - sun.sunrise) / (sun.sunset - sun.sunrise)));
-            // sp=0 -> East (0 rad), sp=0.5 -> North (-PI/2 rad), sp=1 -> West (-PI rad)
-            const sunAng = -sp * Math.PI;
-            const sx = cx + Math.cos(sunAng) * (cr + 5);
-            const sy = cy + Math.sin(sunAng) * (cr + 5);
-            wCtx.beginPath();
-            wCtx.arc(sx, sy, 4.5, 0, Math.PI * 2);
-            wCtx.fillStyle = '#fde047';
-            wCtx.fill();
-        } else {
-            wCtx.beginPath();
-            wCtx.arc(cx, cy + cr + 5, 3.8, 0, Math.PI * 2);
-            wCtx.fillStyle = '#e2e8f0';
-            wCtx.fill();
-        }
-        wCtx.restore();
-    }
-
-    // 8. Master 24-Second Time-of-Day Loop, Scrubber & Speed Controller
-    let loopDurationSec = (fileData.animation && fileData.animation.defaultLoopSeconds) || 24; // 1s = 1h default!
-    let simHour = (fileData.animation && typeof fileData.animation.startHour === 'number') ? fileData.animation.startHour : 6.5;
-    let isPlaying = true;
-    let speedMode = 'loop'; // 'loop' | 'realtime'
-    let isScrubbing = false;
-    let lastFrameMs = performance.now();
-
-    const playPauseBtn = document.getElementById('playPauseBtn');
-    const speedSelect = document.getElementById('speedPresetSelect');
-    const customLoopWrap = document.getElementById('customLoopWrap');
-    const customLoopInput = document.getElementById('customLoopSecondsInput');
-    const scrubberWrap = document.getElementById('scrubberTrackWrap');
-
-    playPauseBtn.addEventListener('click', () => {
-        isPlaying = !isPlaying;
-        playPauseBtn.innerText = isPlaying ? '⏸ Pause' : '▶ Play';
-    });
-
-    speedSelect.addEventListener('change', () => {
-        const val = speedSelect.value;
-        if (val === 'realtime') {
-            speedMode = 'realtime';
-            customLoopWrap.style.display = 'none';
-        } else if (val === 'custom') {
-            speedMode = 'loop';
-            customLoopWrap.style.display = 'inline-flex';
-            loopDurationSec = Math.max(3, parseFloat(customLoopInput.value) || 24);
-        } else {
-            speedMode = 'loop';
-            customLoopWrap.style.display = 'none';
-            loopDurationSec = parseFloat(val) || 24;
-            customLoopInput.value = String(loopDurationSec);
-        }
-    });
-
-    customLoopInput.addEventListener('input', () => {
-        const v = parseFloat(customLoopInput.value);
-        if (!isNaN(v) && v >= 2) loopDurationSec = v;
-    });
-
-    function scrubFromPointer(clientX) {
-        const rect = document.getElementById('scrubberTrack').getBoundingClientRect();
-        const frac = Math.max(0, Math.min(0.999, (clientX - rect.left) / rect.width));
-        simHour = frac * 24;
-        if (speedMode === 'realtime') {
-            speedMode = 'loop';
-            speedSelect.value = String(loopDurationSec);
-        }
-    }
-
-    scrubberWrap.addEventListener('pointerdown', (e) => {
-        isScrubbing = true;
-        scrubberWrap.setPointerCapture(e.pointerId);
-        scrubFromPointer(e.clientX);
-    });
-    scrubberWrap.addEventListener('pointermove', (e) => {
-        if (isScrubbing) scrubFromPointer(e.clientX);
-    });
-    scrubberWrap.addEventListener('pointerup', () => { isScrubbing = false; });
-
-    function getRealWellingtonHour() {
-        const now = new Date();
-        const parts = new Intl.DateTimeFormat('en-NZ', {
-            timeZone: 'Pacific/Auckland',
-            hour: 'numeric',
-            minute: 'numeric',
-            second: 'numeric',
-            hour12: false
-        }).formatToParts(now);
-        const h = parseInt((parts.find(p => p.type === 'hour') || {}).value || '0', 10) % 24;
-        const m = parseInt((parts.find(p => p.type === 'minute') || {}).value || '0', 10);
-        const s = parseInt((parts.find(p => p.type === 'second') || {}).value || '0', 10);
-        return h + m / 60 + s / 3600;
-    }
-
-    function tick(nowMs) {
-        const dtSec = Math.min(0.1, (nowMs - lastFrameMs) / 1000);
-        lastFrameMs = nowMs;
-
-        if (!isScrubbing) {
-            if (speedMode === 'realtime') {
-                simHour = getRealWellingtonHour();
-            } else if (isPlaying) {
-                // Advance 24 hours every `loopDurationSec` seconds (default 24s -> 1 hour/sec)
-                simHour = (simHour + (24 / loopDurationSec) * dtSec) % 24;
-            }
-        }
-
-        const sun = getSunriseSunset();
-        const weather = getWeatherAtHour(simHour);
-        const isNight = simHour < sun.sunrise || simHour > sun.sunset;
-        const emoji = weatherEmojiFor(weather, isNight);
-
-        // Update Clocks, Scrubber & Weather HUD
-        const hhmm = formatHourHHMM(simHour);
-        const pct = (simHour / 24) * 100;
-        document.getElementById('simClockReadout').innerText = hhmm;
-        document.getElementById('scrubberFill').style.width = pct.toFixed(2) + '%';
-        document.getElementById('scrubberThumb').style.left = pct.toFixed(2) + '%';
-        document.getElementById('progressPercentReadout').innerText = `${hhmm} (${Math.round(pct)}%)`;
-
-        document.getElementById('hudWeatherIcon').innerText = emoji;
-        document.getElementById('hudWeatherText').innerText =
-            `${Math.round(weather.tempC)}°C • ${Math.round(weather.windKmh)} km/h ${weather.windLabel} • ${weather.condition}`;
-        document.getElementById('currentBigWeatherEmoji').innerText = emoji;
-
-        // Highlight active 3h weather slot
-        const activeSlotHr = Math.floor(simHour / 3) * 3;
-        document.querySelectorAll('.hour-slot').forEach(el => {
-            el.classList.toggle('active-slot', parseInt(el.dataset.hour, 10) === activeSlotHr);
-        });
-
-        // Update Ben's Geographic Position & Active Calendar Highlight
-        const benState = computeBenStateAtHour(simHour);
-        benMarker.setLatLng([benState.lat, benState.lng]);
-        routeDoneLine.setLatLngs(benState.traveledPts);
-
-        const calloutEl = document.getElementById('benMapCallout');
-        if (calloutEl) calloutEl.innerText = benState.label;
-        document.getElementById('benStatusTopBadge').innerText = benState.topBadge || benState.label;
-
-        if (followBenMode) {
-            map.setView([benState.lat, benState.lng], map.getZoom(), { animate: false });
-        }
-
-        document.querySelectorAll('.agenda-item').forEach(el => {
-            el.classList.toggle('active-now', parseInt(el.dataset.planIndex, 10) === benState.activeIdx);
-        });
-
-        // Render Sky Horizon & Map Weather Particle Canvases
-        drawSkyHorizon(simHour, weather, sun);
-        drawMapAtmosphereAndWeather(simHour, weather, sun, dtSec);
-
-        requestAnimationFrame(tick);
-    }
-
-    // Boot Sequence
-    renderLocationsAndPins();
-    renderAgendaUI();
-    renderTodosUI();
     renderSpotlightUI();
-    refreshWeatherSummaryUI();
-    resizeCanvases();
-    rebuildRoutes();
-    if (useLiveWeather) fetchLiveWellingtonWeather();
-    requestAnimationFrame(tick);
+
 })();
 </script>
 
