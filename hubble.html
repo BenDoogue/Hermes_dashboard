@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HUBBLE DEEP FIELD // COSMIC SCALE VISUALISER</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #202124;
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            border: 1px solid #dadce0;
+            padding: 30px;
+            box-shadow: 0 1px 6px rgba(32,33,36,.28);
+            background: #ffffff;
+            border-radius: 8px;
+            text-align: left;
+        }
+        h2, h3 {
+            color: #202124;
+            text-align: center;
+        }
+        .google-sub {
+            font-size: 14px;
+            color: #5f6368;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .card {
+            border: 1px solid #dadce0;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .comparison-grid {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .comp-item {
+            background: #ffffff;
+            border: 1px solid #dadce0;
+            padding: 15px;
+            border-radius: 6px;
+            width: 250px;
+            text-align: center;
+        }
+        .comp-item strong {
+            color: #1a73e8;
+            display: block;
+            margin-bottom: 5px;
+        }
+        canvas {
+            border: 1px solid #dadce0;
+            background: #0b0f19;
+            display: block;
+            margin: 15px auto;
+            border-radius: 6px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+        .controls {
+            text-align: center;
+            margin: 15px 0;
+        }
+        button {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+        }
+        button:hover {
+            background-color: #1557b0;
+        }
+        button.secondary {
+            background-color: #f1f3f4;
+            color: #3c4043;
+            border: 1px solid #dadce0;
+        }
+        button.secondary:hover {
+            background-color: #e8f0fe;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 25px;
+            color: #1a0dab;
+            background: #f1f3f4;
+            border: 1px solid #dadce0;
+            padding: 8px 18px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .back-link:hover {
+            background: #e8f0fe;
+            border-color: #d2e3fc;
+        }
+        .footer-nav {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>HUBBLE DEEP FIELD // COSMIC SCALE VISUALISER</h2>
+    <div class="google-sub">Interactive Angular Scale & Sky Location Explorer</div>
+
+    <div class="card">
+        <h3>1. The Scale of the Cosmos (1/26th of a Degree)</h3>
+        <p>In December 1995, the Hubble Space Telescope stared at an apparently empty patch of sky in the constellation <strong>Ursa Major</strong> (near the Big Dipper) for 10 consecutive days. That tiny patch covered an angular area of just 2.4 arcminutes on a side—roughly <strong>1/26th of an angular degree</strong>.</p>
+        
+        <div class="comparison-grid">
+            <div class="comp-item">
+                <strong>Full Moon</strong>
+                <p>~30 arcminutes across (0.5°). The Hubble Deep Field patch fits inside the Moon's disk over 100 times!</p>
+            </div>
+            <div class="comp-item">
+                <strong>Grain of Sand at Arm's Length</strong>
+                <p>Spans about 1 arcminute. The Deep Field patch is comparable to holding a grain of sand at arm's length.</p>
+            </div>
+            <div class="comp-item">
+                <strong>Outstretched Finger</strong>
+                <p>Covers roughly 1 degree of the night sky—making the Deep Field ~26 times smaller than your fingertip!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>2. Interactive Sky Context & Scale Simulator</h3>
+        <p>Use the controls below to zoom from the night sky (Ursa Major) down to the tiny Hubble Deep Field patch, revealing thousands of ancient galaxies.</p>
+        
+        <div class="controls">
+            <button onclick="setView('sky')">1. Sky View (Ursa Major)</button>
+            <button class="secondary" onclick="setView('moon')">2. Moon Comparison</button>
+            <button class="secondary" onclick="setView('deepfield')">3. Deep Field Zoom</button>
+        </div>
+
+        <canvas id="simCanvas" width="600" height="400"></canvas>
+        <div id="statusText" style="text-align: center; font-weight: bold; color: #1a73e8; margin-top: 10px;">
+            View: Ursa Major (The Big Dipper) &bull; Red box indicates Hubble Deep Field location
+        </div>
+    </div>
+
+    <div class="footer-nav">
+        <a class="back-link" href="index.html">&larr; Return to Dashboard</a>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById("simCanvas");
+const ctx = canvas.getContext("2d");
+
+let currentView = 'sky'; // 'sky', 'moon', 'deepfield'
+let deepFieldGalaxies = [];
+
+// Generate random distant galaxies for the deep field view
+for (let i = 0; i < 300; i++) {
+    deepFieldGalaxies.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 2.5 + 0.5,
+        brightness: Math.random() * 150 + 105,
+        type: Math.random() > 0.6 ? 'spiral' : 'elliptical',
+        color: ['#ffffff', '#ffeedd', '#d0e1fd', '#ffd1dc', '#fff4cc'][Math.floor(Math.random() * 5)]
+    });
+}
+
+function setView(view) {
+    currentView = view;
+    if (view === 'sky') {
+        document.getElementById("statusText").innerText = "View: Ursa Major (The Big Dipper) \u2022 Red box indicates Hubble Deep Field location";
+    } else if (view === 'moon') {
+        document.getElementById("statusText").innerText = "View: Full Moon Comparison (~30 arcminutes) vs. Hubble Deep Field (Tiny red square)";
+    } else if (view === 'deepfield') {
+        document.getElementById("statusText").innerText = "View: Hubble Deep Field (1/26th of a degree) \u2022 Over 3,000 ancient galaxies revealed";
+    }
+    draw();
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (currentView === 'sky') {
+        // Draw starry background
+        ctx.fillStyle = "#ffffff";
+        for (let i = 0; i < 80; i++) {
+            let px = (i * 37) % canvas.width;
+            let py = (i * 73) % canvas.height;
+            ctx.fillRect(px, py, 1.5, 1.5);
+        }
+
+        // Draw Big Dipper constellation lines
+        let stars = [
+            {x: 100, y: 150, name: 'Dubhe'},
+            {x: 160, y: 140, name: 'Merak'},
+            {x: 220, y: 180, name: 'Phecda'},
+            {x: 200, y: 240, name: 'Megrez'},
+            {x: 270, y: 280, name: 'Alioth'},
+            {x: 340, y: 300, name: 'Mizar'},
+            {x: 420, y: 310, name: 'Alkaid'}
+        ];
+
+        ctx.strokeStyle = "#4285F4";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let i = 0; i < stars.length; i++) {
+            if (i === 0) ctx.moveTo(stars[i].x, stars[i].y);
+            else ctx.lineTo(stars[i].x, stars[i].y);
+        }
+        ctx.stroke();
+
+        // Draw star circles & names
+        for (let star of stars) {
+            ctx.fillStyle = "#FBBC05";
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "12px Arial";
+            ctx.fillText(star.name, star.x + 8, star.y - 5);
+        }
+
+        // Draw Hubble Deep Field target box near Megrez/Phecda
+        ctx.strokeStyle = "#EA4335";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(230, 210, 25, 25);
+
+        ctx.fillStyle = "#EA4335";
+        ctx.font = "bold 12px Arial";
+        ctx.fillText("HDF Target", 260, 225);
+
+    } else if (currentView === 'moon') {
+        // Draw Full Moon
+        let centerX = canvas.width / 2;
+        let centerY = canvas.height / 2;
+        let moonRadius = 130;
+
+        ctx.fillStyle = "#e8f0fe";
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, moonRadius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#b0c4de";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Moon craters
+        ctx.fillStyle = "#d2e3fc";
+        ctx.beginPath(); ctx.arc(centerX - 40, centerY - 30, 25, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(centerX + 50, centerY + 40, 35, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(centerX - 20, centerY + 50, 20, 0, Math.PI * 2); ctx.fill();
+
+        // Hubble Deep Field tiny comparative box (1/12th of moon diameter)
+        let boxSize = 22;
+        ctx.strokeStyle = "#EA4335";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(centerX - boxSize / 2, centerY - moonRadius + 30, boxSize, boxSize);
+
+        ctx.fillStyle = "#EA4335";
+        ctx.font = "bold 12px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("Hubble Deep Field (1/26°)", centerX, centerY - moonRadius + 15);
+
+    } else if (currentView === 'deepfield') {
+        // Draw Deep Field Galaxies
+        for (let gal of deepFieldGalaxies) {
+            ctx.fillStyle = gal.color;
+            ctx.beginPath();
+            ctx.arc(gal.x, gal.y, gal.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Glow
+            ctx.fillStyle = gal.color;
+            ctx.globalAlpha = 0.3;
+            ctx.beginPath();
+            ctx.arc(gal.x, gal.y, gal.radius * 2.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+        }
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 14px Arial";
+        ctx.textAlign = "left";
+        ctx.fillText("Hubble Deep Field View (~3,000 Galaxies)", 20, 30);
+    }
+}
+
+// Initial draw
+draw();
+</script>
+
+</body>
+</html>
