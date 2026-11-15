@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FLAPPY_HERMES.EXE</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #00ff00;
+            font-family: "Courier New", Courier, monospace;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h2 {
+            text-shadow: 0 0 10px #00ff00;
+            margin-bottom: 5px;
+        }
+        canvas {
+            border: 2px solid #00ff00;
+            background: #000800;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            display: block;
+            margin: 20px auto;
+        }
+        .instructions {
+            font-size: 14px;
+            color: #ffff00;
+            margin-top: 10px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 5px 15px;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            background: #00ff00;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>⚡ FLAPPY_HERMES.EXE ⚡</h2>
+    <div class="instructions">Press [SPACEBAR] or [CLICK] to Flap. Avoid the System Obstacles!</div>
+
+    <canvas id="gameCanvas" width="400" height="500"></canvas>
+
+    <div>
+        <a class="back-link" href="index.html">&lt;&lt; RETURN TO DASHBOARD</a>
+    </div>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+// Game variables
+let bird = { x: 50, y: 200, width: 20, height: 20, gravity: 0.6, lift: -10, velocity: 0 };
+let pipes = [];
+let frameCount = 0;
+let score = 0;
+let highScore = 0;
+let isGameOver = false;
+let gameStarted = false;
+
+// Controls
+document.addEventListener("keydown", function(e) {
+    if (e.code === "Space") {
+        flap();
+        e.preventDefault();
+    }
+});
+
+canvas.addEventListener("click", function() {
+    flap();
+});
+
+function flap() {
+    if (isGameOver) {
+        resetGame();
+    } else {
+        bird.velocity = bird.lift;
+        gameStarted = true;
+    }
+}
+
+function resetGame() {
+    bird.y = 200;
+    bird.velocity = 0;
+    pipes = [];
+    score = 0;
+    frameCount = 0;
+    isGameOver = false;
+    gameStarted = false;
+}
+
+function spawnPipe() {
+    let gap = 130;
+    let minHeight = 50;
+    let maxHeight = canvas.height - gap - 50;
+    let height = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight;
+
+    pipes.push({
+        x: canvas.width,
+        top: height,
+        bottom: canvas.height - height - gap,
+        passed: false
+    });
+}
+
+function update() {
+    if (!gameStarted) return;
+
+    // Bird physics
+    bird.velocity += bird.gravity;
+    bird.y += bird.velocity;
+
+    // Floor and ceiling collision
+    if (bird.y + bird.height >= canvas.height || bird.y <= 0) {
+        isGameOver = true;
+    }
+
+    // Pipes logic
+    if (frameCount % 90 === 0) {
+        spawnPipe();
+    }
+
+    for (let i = pipes.length - 1; i >= 0; i--) {
+        pipes[i].x -= 3;
+
+        // Collision detection
+        if (
+            bird.x < pipes[i].x + 40 &&
+            bird.x + bird.width > pipes[i].x &&
+            (bird.y < pipes[i].top || bird.y + bird.height > canvas.height - pipes[i].bottom)
+        ) {
+            isGameOver = true;
+        }
+
+        // Score update
+        if (!pipes[i].passed && pipes[i].x + 40 < bird.x) {
+            score++;
+            if (score > highScore) highScore = score;
+            pipes[i].passed = true;
+        }
+
+        // Remove off-screen pipes
+        if (pipes[i].x < -50) {
+            pipes.splice(i, 1);
+        }
+    }
+
+    frameCount++;
+}
+
+function draw() {
+    // Clear screen
+    ctx.fillStyle = "#000800";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw grid lines for retro CRT feel
+    ctx.strokeStyle = "#001a00";
+    ctx.lineWidth = 1;
+    for (let i = 0; i < canvas.width; i += 20) {
+        ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+    }
+    for (let j = 0; j < canvas.height; j += 20) {
+        ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(canvas.width, j); ctx.stroke();
+    }
+
+    // Draw pipes
+    ctx.fillStyle = "#00ff00";
+    ctx.strokeStyle = "#ffff00";
+    for (let pipe of pipes) {
+        ctx.fillRect(pipe.x, 0, 40, pipe.top);
+        ctx.strokeRect(pipe.x, 0, 40, pipe.top);
+        
+        ctx.fillRect(pipe.x, canvas.height - pipe.bottom, 40, pipe.bottom);
+        ctx.strokeRect(pipe.x, canvas.height - pipe.bottom, 40, pipe.bottom);
+    }
+
+    // Draw bird (retro green block with eye)
+    ctx.fillStyle = "#ffff00";
+    ctx.fillRect(bird.x, bird.y, bird.width, bird.height);
+    ctx.strokeStyle = "#00ff00";
+    ctx.strokeRect(bird.x, bird.y, bird.width, bird.height);
+    
+    // Bird eye
+    ctx.fillStyle = "#000";
+    ctx.fillRect(bird.x + 12, bird.y + 4, 4, 4);
+
+    // Draw Score
+    ctx.fillStyle = "#00ff00";
+    ctx.font = "20px 'Courier New'";
+    ctx.textAlign = "left";
+    ctx.fillText("SCORE: " + score, 20, 35);
+    ctx.fillText("HI-SCORE: " + highScore, 20, 60);
+
+    // Start / Game Over screens
+    if (!gameStarted && !isGameOver) {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#00ff00";
+        ctx.font = "24px 'Courier New'";
+        ctx.textAlign = "center";
+        ctx.fillText("PRESS SPACE TO START", canvas.width / 2, canvas.height / 2);
+    }
+
+    if (isGameOver) {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#ff0000";
+        ctx.font = "28px 'Courier New'";
+        ctx.textAlign = "center";
+        ctx.fillText("SYS_CRASH (GAME OVER)", canvas.width / 2, canvas.height / 2 - 20);
+        ctx.fillStyle = "#00ff00";
+        ctx.font = "16px 'Courier New'";
+        ctx.fillText("CLICK OR SPACE TO REBOOT", canvas.width / 2, canvas.height / 2 + 20);
+    }
+}
+
+function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+}
+
+loop();
+</script>
+
+</body>
+</html>
