@@ -1465,8 +1465,8 @@
     });
     L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
-    // Crisp CartoDB Voyager real street & coastline map of Wellington (free, Retina @2x, no API key)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    // Crisp CartoDB Voyager real street & coastline map of Wellington with authorized CARTO key
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=cb1_59f2_1_8a75ef4c4aa8e781723c87ea', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; CARTO',
         subdomains: 'abcd',
         maxZoom: 19
