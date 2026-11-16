@@ -56,6 +56,7 @@ window.BRIEFING_DATA = {
 
     // Interactive To-Do List
     todos: [
+        { id: "t0", text: "🚨 URGENT: Contact student success advisor", tag: "Urgent", done: false },
         { id: "t1", text: "Complete morning work session at 39 The Terrace (8:30 - 1:45)", tag: "Work", done: false },
         { id: "t2", text: "Attend presentation at 8 Willis Street (2:00 - 3:00)",          tag: "Event", done: false },
         { id: "t3", text: "Resume work at 39 The Terrace until 5:00 PM",                  tag: "Work", done: false },
