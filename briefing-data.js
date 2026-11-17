@@ -64,8 +64,8 @@ window.BRIEFING_DATA = {
     },
 
     emailSummary: [
-        { date: "16 Nov 2026, 17:18", title: "Google AI Studio: API Service Paused", description: "Gemini API service paused due to spend caps. Increase or remove spend cap to resume.", important: true },
-        { date: "15 Nov 2026, 23:29", title: "Google Security Alert", description: "New sign-in detected on a Windows device for your Google Account.", important: true },
-        { date: "16 Nov 2026, 00:01", title: "StudyLink: 2027 Application Reminder", description: "Reminder to apply for your student allowance and loan before 16 December.", important: true }
+        { date: "16 Nov 2026, 17:18 NZST", title: "Google AI Studio: API Service Paused", description: "Gemini API service paused due to spend caps. Increase or remove spend cap to resume.", important: true },
+        { date: "15 Nov 2026, 23:29 NZST", title: "Google Security Alert", description: "New sign-in detected on a Windows device for your Google Account.", important: true },
+        { date: "16 Nov 2026, 00:01 NZST", title: "StudyLink: 2027 Application Reminder", description: "Reminder to apply for your student allowance and loan before 16 December.", important: true }
     ]
 };
