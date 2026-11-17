@@ -2,10 +2,10 @@
  * HERMES DASHBOARD — DAILY BRIEFING & WELLINGTON MAP CONFIG
  * =========================================================
  * Updated for Monday, 16 November 2026
- * Schedule: Work and Home only. Work 8:30 AM – 5:00 PM weekdays (Nov 18 start at 8:00 AM). University study removed.
+ * Schedule: Work and Home only in daily agenda. University study kept in to-dos and emails.
  */
 window.BRIEFING_DATA = {
-    version: "2026-11-16-v4",
+    version: "2026-11-16-v5",
     dateLabel: "Monday, 16 Nov 2026 (NZDT)",
 
     animation: {
@@ -45,13 +45,14 @@ window.BRIEFING_DATA = {
     ],
 
     todos: [
+        { id: "t0", text: "🚨 URGENT: Contact student success advisor regarding academic check-in", tag: "Urgent", done: false },
         { id: "t1", text: "Work session at 39 The Terrace (8:30 AM – 5:00 PM; Wed Nov 18 starts at 8:00 AM)", tag: "Work", done: false },
         { id: "t2", text: "Return home to 14 Essex Street & relax", tag: "Home", done: false }
     ],
 
     dailySpotlight: {
         interestTopic: "Cognitive Science & Autonomous AI Systems",
-        morningTask: "Work 8:30 AM – 5:00 PM every weekday at 39 The Terrace (Wednesday Nov 18th starts at 8:00 AM). University study removed.",
+        morningTask: "Contact student success advisor, and complete work sessions at 39 The Terrace (8:30 AM – 5:00 PM, Wed Nov 18 starts at 8:00 AM). University study removed from daily schedule.",
         factOfTheDay: "Predictive coding theories of brain function model perception as a hierarchical process of minimizing top-down prediction errors against sensory inputs.",
         historyFact: "On 16 November 1945, UNESCO was founded in London with the signing of its constitution by 37 nations.",
         wordOfTheDay: {
@@ -62,6 +63,7 @@ window.BRIEFING_DATA = {
     },
 
     emailSummary: [
-        { date: "16 Nov 2026, 04:15", title: "Schedule Updated", description: "Work and Home schedule only. Work: 8:30 AM – 5:00 PM weekdays (Nov 18 start at 8:00 AM). University study removed.", important: true }
+        { date: "16 Nov 2026, 04:15", title: "Student Services Notice", description: "Reminder regarding academic progression check-in with your success advisor.", important: true },
+        { date: "15 Nov 2026, 20:30", title: "GitHub Pull Request Review", description: "Review requested on repository Hermes_dashboard branch main.", important: true }
     ]
 };
