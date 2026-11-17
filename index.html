@@ -593,19 +593,42 @@
     document.getElementById('briefing-date-label').innerText = todayNzLabel;
 
     // 2. Weather Strip
+    function formatHourDecimal(h) {
+        const hrs = Math.floor(h);
+        const mins = Math.round((h - hrs) * 60);
+        return String(hrs).padStart(2,'0') + ':' + String(mins).padStart(2,'0');
+    }
+
     function renderWeatherStrip() {
-        const tl = (state.weatherConfig && state.weatherConfig.timeline) || [];
+        const wc = state.weatherConfig || {};
+        const tl = wc.timeline || [];
         const strip = document.getElementById('compactWeatherStrip');
         strip.innerHTML = '';
+
+        const sunrise = wc.sunriseHour !== undefined ? wc.sunriseHour : 5.73;
+        const sunset = wc.sunsetHour !== undefined ? wc.sunsetHour : 20.27;
+
+        const temps = tl.map(t => t.tempC).filter(t => !isNaN(t));
+        const minTemp = temps.length ? Math.min(...temps) : 11;
+        const maxTemp = temps.length ? Math.max(...temps) : 18;
+        const labelEl = document.getElementById('weatherSummaryLabel');
+        if (labelEl) {
+            const sunriseStr = formatHourDecimal(sunrise);
+            const sunsetStr = formatHourDecimal(sunset);
+            labelEl.innerHTML = `${Math.round(minTemp)}°C – ${Math.round(maxTemp)}°C &bull; Sunrise: ${sunriseStr}, Sunset: ${sunsetStr}`;
+        }
 
         tl.forEach(item => {
             const slot = document.createElement('div');
             slot.className = 'weather-slot';
-            let emoji = '☀️';
+            const isNight = item.hour < sunrise || item.hour >= sunset;
+            
+            let emoji = isNight ? '🌙' : '☀️';
             if (item.type === 'rain' || item.precipMm > 0) emoji = '🌧️';
             else if (item.windKmh > 35) emoji = '💨';
             else if (item.cloudCover > 70) emoji = '☁️';
             else if (item.cloudCover > 30) emoji = '⛅';
+            else if (isNight && item.cloudCover <= 30) emoji = '🌙';
 
             slot.innerHTML = `
                 <div class="time">${String(item.hour).padStart(2,'0')}:00</div>
