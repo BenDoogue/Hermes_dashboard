@@ -1,12 +1,12 @@
 /**
  * HERMES DASHBOARD — DAILY BRIEFING & WELLINGTON MAP CONFIG
  * =========================================================
- * Updated for Tuesday, 17 November 2026
- * Schedule: Work and Home only in daily agenda. University study kept in to-dos and emails.
+ * Updated for Thursday, 26 November 2026
+ * Schedule: Work and Home daily agenda.
  */
 window.BRIEFING_DATA = {
-    version: "2026-11-17-v1",
-    dateLabel: "Tuesday, 17 Nov 2026 (NZDT)",
+    version: "2026-11-26-v1",
+    dateLabel: "Thursday, 26 Nov 2026 (NZDT)",
 
     animation: {
         defaultLoopSeconds: 24,
@@ -17,19 +17,19 @@ window.BRIEFING_DATA = {
 
     weather: {
         autoFetchLive: true,
-        summary: "Pleasant spring Wellington day with decreasing cloudiness, crisp sunny intervals, and a moderate breeze, reaching a high of 17°C.",
-        sunriseHour: 5.78,
-        sunsetHour: 20.28,
+        summary: "Pleasant late spring Wellington day with crisp sunny intervals, gentle southerly breeze, reaching a high of 19°C.",
+        sunriseHour: 5.75,
+        sunsetHour: 20.32,
         timeline: [
-            { hour: 0,  tempC: 11, condition: "Cool Night",          type: "clear",         cloudCover: 15, windKmh: 15, windDirDeg: 180, windLabel: "S", precipMm: 0 },
-            { hour: 4,  tempC: 9,  condition: "Cold Pre-Dawn",       type: "clear",         cloudCover: 10, windKmh: 12, windDirDeg: 175, windLabel: "S", precipMm: 0 },
-            { hour: 7,  tempC: 12, condition: "Crisp Morning Sun",   type: "clear",         cloudCover: 20, windKmh: 16, windDirDeg: 170, windLabel: "SSE", precipMm: 0 },
-            { hour: 10, tempC: 15, condition: "Decreasing Clouds",   type: "partly_cloudy", cloudCover: 30, windKmh: 20, windDirDeg: 165, windLabel: "SSE", precipMm: 0 },
-            { hour: 13, tempC: 17, condition: "Mild Sunny Intervals",type: "partly_cloudy", cloudCover: 25, windKmh: 22, windDirDeg: 160, windLabel: "SSE", precipMm: 0 },
-            { hour: 15, tempC: 16, condition: "Afternoon Breeze",    type: "partly_cloudy", cloudCover: 35, windKmh: 22, windDirDeg: 155, windLabel: "SE", precipMm: 0 },
-            { hour: 17, tempC: 15, condition: "Clear Evening",       type: "clear",         cloudCover: 15, windKmh: 18, windDirDeg: 150, windLabel: "SE", precipMm: 0 },
-            { hour: 20, tempC: 13, condition: "Calm Night",          type: "clear",         cloudCover: 10, windKmh: 12, windDirDeg: 145, windLabel: "SE", precipMm: 0 },
-            { hour: 23, tempC: 11, condition: "Starry Sky",          type: "clear",         cloudCover: 5,  windKmh: 10, windDirDeg: 140, windLabel: "SE", precipMm: 0 }
+            { hour: 0,  tempC: 13, condition: "Mild Night",          type: "clear",         cloudCover: 10, windKmh: 20, windDirDeg: 180, windLabel: "S", precipMm: 0 },
+            { hour: 4,  tempC: 12, condition: "Cool Pre-Dawn",       type: "clear",         cloudCover: 10, windKmh: 18, windDirDeg: 175, windLabel: "SSE", precipMm: 0 },
+            { hour: 7,  tempC: 12, condition: "Crisp Morning Sun",   type: "clear",         cloudCover: 15, windKmh: 14, windDirDeg: 170, windLabel: "SSE", precipMm: 0 },
+            { hour: 10, tempC: 15, condition: "Sunny Intervals",     type: "partly_cloudy", cloudCover: 25, windKmh: 12, windDirDeg: 165, windLabel: "SSE", precipMm: 0 },
+            { hour: 13, tempC: 18, condition: "Warm Midday",         type: "partly_cloudy", cloudCover: 20, windKmh: 10, windDirDeg: 160, windLabel: "S", precipMm: 0 },
+            { hour: 15, tempC: 19, condition: "Afternoon Peak",      type: "clear",         cloudCover: 15, windKmh: 10, windDirDeg: 155, windLabel: "SSW", precipMm: 0 },
+            { hour: 17, tempC: 19, condition: "Clear Evening Sun",   type: "clear",         cloudCover: 10, windKmh: 12, windDirDeg: 150, windLabel: "SSW", precipMm: 0 },
+            { hour: 20, tempC: 16, condition: "Cooling Down",        type: "clear",         cloudCover: 10, windKmh: 10, windDirDeg: 145, windLabel: "SSE", precipMm: 0 },
+            { hour: 23, tempC: 12, condition: "Starry Night",        type: "clear",         cloudCover: 5,  windKmh: 8,  windDirDeg: 140, windLabel: "SE", precipMm: 0 }
         ]
     },
 
@@ -53,19 +53,19 @@ window.BRIEFING_DATA = {
 
     dailySpotlight: {
         interestTopic: "Cognitive Science & Autonomous AI Systems",
-        morningTask: "Resolve Gemini API spend cap, review StudyLink 2027 application, and complete work session at 39 The Terrace (8:30 AM – 5:00 PM).",
-        factOfTheDay: "Hierarchical predictive processing models propose that the brain constantly generates top-down predictions of sensory input while propagating bottom-up prediction errors.",
-        historyFact: "On 17 November 1869, the Suez Canal was officially opened, linking the Mediterranean Sea to the Red Sea and transforming global maritime navigation.",
+        morningTask: "Resolve Gemini API spend cap, review StudyLink 2027 application deadline (Dec 16), and complete work session at 39 The Terrace.",
+        factOfTheDay: "The hippocampus indexes episodic memories, binding together distributed sensory inputs across neocortical networks during sleep consolidation.",
+        historyFact: "On 26 November 1922, Howard Carter and Lord Carnarvon became the first people to enter the tomb of Pharaoh Tutankhamun in over 3,000 years.",
         wordOfTheDay: {
-            term: "Plasticity",
-            pronunciation: "/plæˈstɪsɪti/",
-            definition: "The adaptability of an organism or neural network to changes in its environment or internal state."
+            term: "Consolidation",
+            pronunciation: "/kənˌsɒlɪˈdeɪʃən/",
+            definition: "The process by which memories or neural connections become stable and permanent over time."
         }
     },
 
     emailSummary: [
-        { date: "16 Nov 2026, 17:18 NZST", title: "Google AI Studio: API Service Paused", description: "Gemini API service paused due to spend caps. Increase or remove spend cap to resume.", important: true },
-        { date: "15 Nov 2026, 23:29 NZST", title: "Google Security Alert", description: "New sign-in detected on a Windows device for your Google Account.", important: true },
-        { date: "16 Nov 2026, 00:01 NZST", title: "StudyLink: 2027 Application Reminder", description: "Reminder to apply for your student allowance and loan before 16 December.", important: true }
+        { date: "25 Nov 2026, 17:18 NZST", title: "Google AI Studio: API Service Paused", description: "Gemini API service paused due to spend caps. Increase or remove spend cap to resume.", important: true },
+        { date: "24 Nov 2026, 23:29 NZST", title: "Google Security Alert", description: "New sign-in detected on a Windows device for your Google Account.", important: true },
+        { date: "25 Nov 2026, 00:01 NZST", title: "StudyLink: 2027 Application Reminder", description: "Reminder to apply for your student allowance and loan before 16 December.", important: true }
     ]
 };
